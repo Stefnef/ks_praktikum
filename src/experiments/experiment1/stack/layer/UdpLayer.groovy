@@ -79,7 +79,7 @@ class UdpLayer {
         //-------------------------------------------------------------------------
 
         while (run) {
-            // blockierendes Lesen von IP-Schicht
+            // blockierendes Lesen von IP-Schicht HIER ERROR IN VIRTUAL NETWORK RECEIVER
             iu_idu = fromIpQ.take()
 
             // UDP-PDU entnehmen
