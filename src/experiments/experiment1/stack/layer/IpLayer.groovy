@@ -188,8 +188,8 @@ class IpLayer {
             linkPortName = "lp1"
             nextHopAddr = ownIpAddrs[linkPortName]
 
-//            // Nächstes Gerät (next hop) auf dem Pfad zum Zielgerät suchen
-//            (linkPortName, nextHopAddr) = findNextHop(ti_idu.dstIpAddr)
+            // Nächstes Gerät (next hop) auf dem Pfad zum Zielgerät suchen
+            (linkPortName, nextHopAddr) = findNextHop(ti_idu.dstIpAddr)
 
             // Nächsten Hop gefunden?
             if (linkPortName && nextHopAddr) {
@@ -249,12 +249,23 @@ class IpLayer {
      */
     List findNextHop(String dstIpAddr) {
         List entryx
+        routingTable = [
+              //  ["0.0.0.0", "0.0.0.0", defaultRouter, "lp1"], // Default Route
 
+              //  ["192.168.1.0", "255.255.255.0", '192.168.1.100', "lp1"],
+                ["192.168.1.0", "255.255.255.0", '192.168.1.53', "lp1"],
+              //  ["192.168.1.0", "255.255.255.0", '192.168.1.80', "lp1"],
+
+                ["0.0.0.0", "255.255.255.0", defaultRouter, "lp1"] // Route in das eigene LAN
+        ]
         // Routingtabelleneinträge durchsuchen
         entryx = routingTable.find { entry ->
             // Ziel-Ip-Adresse UND Netzpräfix == Zieladresse ?
             Utils.getNetworkId(dstIpAddr, entry[1] as String) == entry[0]
+
         }
+
+        Utils.writeLog("IpLayer", "send", "finde in Routingtabelle: $entryx", 4)
 
         // Ausgang gefunden?
         if (entryx) {

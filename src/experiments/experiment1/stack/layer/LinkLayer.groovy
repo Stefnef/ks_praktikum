@@ -75,9 +75,9 @@ class LinkLayer {
     // Methoden ANFANG
     //========================================================================================================
 
-    /**
-     * Empfängt Daten von der IP-Schicht und verarbeitet sie
-     */
+/**
+ * Empfängt Daten von den Anschlüssen und verarbeitet sie */
+
     void receive() {
         while (run) {
             /** IDU von Anschluessen */
@@ -216,6 +216,7 @@ class LinkLayer {
 
             // Namen des Linkports entnehmen
             lpName = il_idu.lpName
+
             // Anschluss bestimmen
             connector = connectors[lpName]
 
@@ -234,11 +235,12 @@ class LinkLayer {
             macFrame.dstMacAddr = "00:00:00:00:00:00"
 
             // oder besser:
-
+            arpTable = [ "192.168.1.80":"80:80:80:80:80:80", "192.168.1.53":"53:53:53:53:53:53", "192.168.1.100":"01:01:01:01:01:01"]
             // Entnahme der MAC-Adresse eines Ziels im LAN aus einer Tabelle
             // aufgrund der IP-Adresse des Ziels; die Tabelle wird manuell verwaltet
-//            macFrame.dstMacAddr = arpTable[il_idu.nextHopAddr]
-
+            macFrame.dstMacAddr = arpTable[il_idu.nextHopAddr]
+            Utils.writeLog("LinkLayer", "send", "gefundene MAC: ${macFrame.dstMacAddr}", 5)
+            return
             // oder besser:
 
 //            // Die MAC-Adresse des Ziel wird aus einer Tabelle entnommen deren Inhalt per ARP
