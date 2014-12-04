@@ -175,6 +175,10 @@ class LinkLayer {
                                     macFrame.sdu = ar_pdu
                                     macFrame.type = ETHERTYPE_ARP // Typfeld
 
+                                    //ist MAC-Adresse vom anfragenden Host bekannt?
+                                    if(!arpTable[ar_pdu.targetProtoAddr])
+                                        arpTable[ar_pdu.targetProtoAddr] = macFrame.dstMacAddr
+
                                     // MAC-Frame mit ARP-PDU an Anschluss uebergeben
                                     // IDU erzeugen
                                     lc_idu = new LC_IDU()
@@ -250,8 +254,7 @@ class LinkLayer {
             // (Address Resolution Protocol) dynamisch bestimmt wird.
             // Wird kein Eintrag gefunden -> null (siehe "?."-Operator)
             macFrame?.dstMacAddr = arpTable[il_idu.nextHopAddr]
-            //macFrame?.dstMacAddr = null //TODO(Steffen): Zeile zum Testen von ARP. Wieder loeschen
-            Utils.writeLog("LinkLayer", "send", "gefundene MAC: ${macFrame.dstMacAddr}", 5)
+            //Utils.writeLog("LinkLayer", "send", "gefundene MAC: ${macFrame.dstMacAddr}", 5)
             // Wurde die MAC-Adresse fuer das naechste Ziel in der ARP-Tabelle gefunden?
             if (!macFrame.dstMacAddr) {
                 // Nein -> ARP verwenden
@@ -285,10 +288,7 @@ class LinkLayer {
                 String nextMacAddr = arpQ.take()
 
                 // Arp-Tabelle aktualisieren
-                Utils.writeLog("LinkLayer", "send", "spechert IP: ${il_idu.nextHopAddr},  MAC: ${nextMacAddr}", 5)
-
                 arpTable[il_idu.nextHopAddr] = nextMacAddr
-                Utils.writeLog("LinkLayer", "send", "ARP-TABLE: ${arpTable}", 5)
                 // MAC-Ziel-Adresse in MAC-Frame einsetzen
                 macFrame.dstMacAddr = "${nextMacAddr}"
             }

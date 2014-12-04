@@ -259,7 +259,7 @@ class IpLayer {
 
         }
 
-        Utils.writeLog("IpLayer", "send", "finde in Routingtabelle: $entryx", 4)
+        //Utils.writeLog("IpLayer", "send", "finde in Routingtabelle: $entryx", 4)
 
 
 
