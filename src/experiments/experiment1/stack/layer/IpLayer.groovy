@@ -228,7 +228,7 @@ class IpLayer {
                     il_idu.nextHopAddr = nextHopAddr
 
                 // IP-Adresse des naechsten Geraetes auf dem Pfad zum Ziel eintragen
-                il_idu.nextHopAddr = nextHopAddr
+                //il_idu.nextHopAddr = nextHopAddr
 
                 // Daten an Link-Schicht uebergeben
                 toLinkQ.put(il_idu)
