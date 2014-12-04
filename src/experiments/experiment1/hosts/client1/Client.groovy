@@ -158,7 +158,7 @@ Host: www.sesam-strasse.com
             if (rdata) serverIpAddr = rdata
         }
 
-        return
+        //return
 
         Utils.writeLog("Client", "client", "sendet HTTP-Request: ${request}", 1)
         // HTTP-GET-Request absenden

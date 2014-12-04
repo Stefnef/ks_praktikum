@@ -249,15 +249,7 @@ class IpLayer {
      */
     List findNextHop(String dstIpAddr) {
         List entryx
-        routingTable = [
-              //  ["0.0.0.0", "0.0.0.0", defaultRouter, "lp1"], // Default Route
 
-              //  ["192.168.1.0", "255.255.255.0", '192.168.1.100', "lp1"],
-                ["192.168.1.0", "255.255.255.0", '192.168.1.53', "lp1"],
-              //  ["192.168.1.0", "255.255.255.0", '192.168.1.80', "lp1"],
-
-                ["0.0.0.0", "255.255.255.0", defaultRouter, "lp1"] // Route in das eigene LAN
-        ]
         // Routingtabelleneinträge durchsuchen
         entryx = routingTable.find { entry ->
             // Ziel-Ip-Adresse UND Netzpräfix == Zieladresse ?
@@ -267,9 +259,14 @@ class IpLayer {
 
         Utils.writeLog("IpLayer", "send", "finde in Routingtabelle: $entryx", 4)
 
+
+
         // Ausgang gefunden?
         if (entryx) {
             // Ja
+            if (entryx[2]=="0.0.0.0")
+                entryx[2] = dstIpAddr
+
             return [entryx[3], entryx[2]]
         }
         else

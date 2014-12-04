@@ -118,9 +118,9 @@ class LinkLayer {
             if (macFrame.dstMacAddr == broadcastMacAddress ||
                     macFrame.dstMacAddr == ownMacAddress) {
                 // Ja
-                // Frame-Typ untersuchen
+                // Frame-Typ untersuchen ob ARP-Anfrage oder normales Packet
                 switch (macFrame.type) {
-                    case ETHERTYPE_IP:
+                    case ETHERTYPE_IP: //normales Paket
                         // IP-PDU behandeln:
 
                         // IDU erzeugen
@@ -132,7 +132,7 @@ class LinkLayer {
                         toIpQ.put(li_idu)
                         break
 
-                    case ETHERTYPE_ARP:
+                    case ETHERTYPE_ARP: // ARP-Anfrage
                         // ARP-PDU behandeln:
                         AR_PDU ar_pdu = macFrame.sdu as AR_PDU
 
@@ -250,7 +250,7 @@ class LinkLayer {
             // (Address Resolution Protocol) dynamisch bestimmt wird.
             // Wird kein Eintrag gefunden -> null (siehe "?."-Operator)
             macFrame?.dstMacAddr = arpTable[il_idu.nextHopAddr]
-            macFrame?.dstMacAddr = null //TODO(Steffen): Zeile zum Testen von ARP. Wieder loeschen
+            //macFrame?.dstMacAddr = null //TODO(Steffen): Zeile zum Testen von ARP. Wieder loeschen
             //Utils.writeLog("LinkLayer", "send", "gefundene MAC: ${macFrame.dstMacAddr}", 5)
             // Wurde die MAC-Adresse fuer das naechste Ziel in der ARP-Tabelle gefunden?
             if (!macFrame.dstMacAddr) {
