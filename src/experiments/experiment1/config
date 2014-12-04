@@ -57,8 +57,10 @@ environments {
             // Eigene TCP- und UDP-Portnummer
             ownPort = 5100
 
-            // Standard-Router
+            // Standard-Router ???
             routerIpAddr = "192.168.1.1"
+            defaultRouter = "192.168.1.1"
+
 
             // IP-Adresse des Nameservers
             nameServerIpAddr = "192.168.1.53"
@@ -91,7 +93,7 @@ environments {
             // Für Routen in das eigene IP-Subnetz ist die Router-IP-Adresse die eigene IP-Adresse:
             // z.B.: ["192.168.1.0", "255.255.255.0", "192.168.1.10", "lp1"]
             routingTable = [
-                        ["192.168.1.0", "255.255.255.0", '0.0.0.0', "lp1"], // Route in das eigene LAN
+                        ["192.168.1.0", "255.255.255.0", ownIPAddr, "lp1"], // Route in das eigene LAN
                         ["0.0.0.0", "0.0.0.0", defaultRouter, "lp1"] // Default Route
 
                            ]
@@ -104,6 +106,7 @@ environments {
         //=============================================================================================
 
         server {
+            ownIPAddr = "192.168.1.80"
             ownPort = 80
             defaultRouter = "192.168.1.1"
             nameServer = "0.0.0.0"
@@ -114,13 +117,13 @@ environments {
                  link: experiments.experiment1.links.Hub1.id,
                  connector: experiments.experiment1.links.Hub1.HUB_PORT_2,
                  macAddr: "80:80:80:80:80:80",
-                 ipAddr: "192.168.1.80"
+                 ipAddr: ownIPAddr
                 ]
             ]
 
             routingTable = [
 
-                        ["192.168.1.0", "255.255.255.0", '0.0.0.0', "lp1"], // Route in das eigene LAN
+                        ["192.168.1.0", "255.255.255.0", ownIPAddr, "lp1"], // Route in das eigene LAN
                         ["0.0.0.0", "0.0.0.0", defaultRouter, "lp1"] // Default Route
                            ]
 
@@ -130,6 +133,7 @@ environments {
         //=============================================================================================
 
         nameserver {
+            ownIPAddr = "192.168.1.53"
             ownPort = 53
             defaultRouter = "192.168.1.1"
 
@@ -139,14 +143,14 @@ environments {
                  link: experiments.experiment1.links.Hub1.id,
                  connector: experiments.experiment1.links.Hub1.HUB_PORT_3,
                  macAddr: "53:53:53:53:53:53",
-                 ipAddr: "192.168.1.53"
+                 ipAddr: ownIPAddr
                 ]
             ]
 
             routingTable = [
 
 
-                        ["192.168.1.0", "255.255.255.0", '0.0.0.0', "lp1"], // Route in das eigene LAN
+                        ["192.168.1.0", "255.255.255.0", ownIPAddr, "lp1"], // Route in das eigene LAN
                         ["0.0.0.0", "0.0.0.0", defaultRouter, "lp1"] // Default Route
                 ]
 

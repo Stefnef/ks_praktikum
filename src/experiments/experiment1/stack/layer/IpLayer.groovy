@@ -188,6 +188,8 @@ class IpLayer {
             linkPortName = "lp1"
             nextHopAddr = ownIpAddrs[linkPortName]
 
+            Utils.writeLog("IpLayer", "send", "ROUTING-TABLE: ${routingTable}", 4)
+
             // Nächstes Gerät (next hop) auf dem Pfad zum Zielgerät suchen
             (linkPortName, nextHopAddr) = findNextHop(ti_idu.dstIpAddr)
 
@@ -218,13 +220,13 @@ class IpLayer {
                 il_idu.lpName = linkPortName
 
                 // Ist es eine direkte Route?
-//                if (nextHopAddr == ownIpAddrs[linkPortName])
-//                    // Ja
-//                    il_idu.nextHopAddr = ???
-//                else
-//                    // Nein
-//                    il_idu.nextHopAddr = ???
-//
+                if (nextHopAddr == ownIpAddrs[linkPortName])
+                    // Ja
+                    il_idu.nextHopAddr = i_pdu.dstIpAddr
+                else
+                    // Nein
+                    il_idu.nextHopAddr = nextHopAddr
+
                 // IP-Adresse des naechsten Geraetes auf dem Pfad zum Ziel eintragen
                 il_idu.nextHopAddr = nextHopAddr
 
@@ -264,9 +266,6 @@ class IpLayer {
         // Ausgang gefunden?
         if (entryx) {
             // Ja
-            if (entryx[2]=="0.0.0.0")
-                entryx[2] = dstIpAddr
-
             return [entryx[3], entryx[2]]
         }
         else
