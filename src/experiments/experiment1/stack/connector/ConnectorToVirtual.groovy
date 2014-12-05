@@ -191,6 +191,7 @@ class ConnectorToVirtual extends Connector {
     //------------------------------------------------------------------------------
     void start() {
         // UDP-Socket zum Senden und Empfangen erzegen
+        //println("Error in virtual network sender:, ${udpPort}# ${localAddr}")
         socket = new DatagramSocket(udpPort, localAddr)
 
         Thread.start { receive() } // Empfänger-Thread starten

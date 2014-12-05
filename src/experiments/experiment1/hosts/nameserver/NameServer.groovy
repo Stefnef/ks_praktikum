@@ -22,11 +22,7 @@ class NameServer {
     Boolean run = true
 
     /** Tabelle zur Umsetzung von Namen in IP-Adressen */
-    Map<String, String> nameTable = [
-            "webserver.local": "192.168.1.80",
-            "alice": "192.168.1.120",
-            "bob": "192.168.1.110",
-    ]
+    Map<String, String> nameTable
 
     /** IP-Adresse und Portnummer des client */
     String srcIpAddr
@@ -68,6 +64,8 @@ class NameServer {
         // Konfiguration holen
         config = Utils.getConfig("experiment1", "nameserver")
 
+        // Namenstabelle aus Config zuweisen
+        nameTable = config.nameTable
         // ------------------------------------------------------------
 
         // Netzwerkstack initialisieren

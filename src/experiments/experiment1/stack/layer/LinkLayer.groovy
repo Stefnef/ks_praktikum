@@ -158,7 +158,7 @@ class LinkLayer {
                                     // Ja
                                     // ARP-Reply senden
 
-                                    Utils.writeLog("LinkLayer", "receive", "empfaengt ARP-Request und sendet Reply", 5)
+
 
                                     ar_pdu.operation = ARP_REPLY
                                     //Eigene IP-Adresse zwischenspeichern
@@ -184,6 +184,8 @@ class LinkLayer {
                                     lc_idu = new LC_IDU()
                                     lc_idu.sdu = macFrame
                                     connector.send(lc_idu)
+
+                                    Utils.writeLog("LinkLayer", "receive", "empfing ARP-Request und sendet Reply: ${lc_idu} ", 5)
                                 }
                                 break
                         }

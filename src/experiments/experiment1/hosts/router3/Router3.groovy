@@ -1,4 +1,4 @@
-package experiments.experiment1.hosts.router1
+package experiments.experiment1.hosts.router3
 
 import common.utils.Utils
 
@@ -8,7 +8,7 @@ import common.utils.Utils
  * Verwendet UDP zur Verteilung der Routinginformationen.
  *
  */
-class Router1 {
+class Router3 {
 
     //========================================================================================================
     // Vereinbarungen ANFANG
@@ -41,7 +41,7 @@ class Router1 {
      */
     static void main(String[] args) {
         // Router-Klasse instanziieren
-        Router1 application = new Router1()
+        Router3 application = new Router3()
         // und starten
         application.router()
     }
@@ -56,7 +56,7 @@ class Router1 {
     void router() {
 
         // Konfiguration holen
-        config = Utils.getConfig("experiment1", "router1")
+        config = Utils.getConfig("experiment1", "router3")
 
         // ------------------------------------------------------------
 
@@ -71,7 +71,7 @@ class Router1 {
 
         // ------------------------------------------------------------
 
-        Utils.writeLog("Router1", "router1", "startet", 1)
+        Utils.writeLog("Router3", "router3", "startet", 1)
 
         while (run) {
             // Periodisches Versenden von Routinginformationen
@@ -98,8 +98,6 @@ class Router1 {
 
         // Auf UDP-Empfang warten
         (iPAddr, port, rInfo) = stack.udpReceive()
-
-        Utils.writeLog("NameServer", "nameserver", "empfängt von $iPAddr:$port: $rInfo ", 3)
 
         // Jetzt aktuelle Routingtablle holen:
         // rt = stack.getRoutingtable()

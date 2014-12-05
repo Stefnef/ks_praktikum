@@ -106,15 +106,15 @@ environments {
         //=============================================================================================
 
         server {
-            ownIPAddr = "192.168.1.80"
+            ownIPAddr = "192.168.2.80"
             ownPort = 80
-            defaultRouter = "192.168.1.1"
+            defaultRouter = "192.168.2.1"
             nameServer = "0.0.0.0"
 
             networkConnectors = [
                 [virtual: true,
-                 lpName: "lp1",
-                 link: experiments.experiment1.links.Hub1.id,
+                 lpName: "lp6",
+                 link: experiments.experiment1.links.Hub2.id,
                  connector: experiments.experiment1.links.Hub1.HUB_PORT_2,
                  macAddr: "80:80:80:80:80:80",
                  ipAddr: ownIPAddr
@@ -123,8 +123,9 @@ environments {
 
             routingTable = [
 
-                        ["192.168.1.0", "255.255.255.0", ownIPAddr, "lp1"], // Route in das eigene LAN
-                        ["0.0.0.0", "0.0.0.0", defaultRouter, "lp1"] // Default Route
+                        ["192.168.2.0", "255.255.255.0", ownIPAddr, "lp6"], // Route in das eigene LAN
+                        ["0.0.0.0", "0.0.0.0", defaultRouter, "lp6"] // Default Route
+
                            ]
 
             arpTable = [:]
@@ -148,10 +149,14 @@ environments {
             ]
 
             routingTable = [
-
-
                         ["192.168.1.0", "255.255.255.0", ownIPAddr, "lp1"], // Route in das eigene LAN
                         ["0.0.0.0", "0.0.0.0", defaultRouter, "lp1"] // Default Route
+                ]
+
+            nameTable = [
+                        "webserver.local": "192.168.2.80",
+                        "alice": "192.168.1.120",
+                        "bob": "192.168.1.110",
                 ]
 
             arpTable = [:]
@@ -161,130 +166,198 @@ environments {
 
         router1 {
             // Eigene TCP- und UDP-Portnummer
-            ownPort = 0
+            ownPort = 5511
 
             networkConnectors = [
-                [virtual: true,
-                 lpName: "lp1",
-                 link: 0,
-                 connector: 0,
-                 macAddr: "00:00:00:00:00:00",
-                 ipAddr: "0.0.0.0"
-                ],
 
+                //P2P zu router2
                 [virtual: true,
                  lpName: "lp2",
-                 link: 0,
-                 connector: 0,
-                 macAddr: "00:00:00:00:00:00",
-                 ipAddr: "0.0.0.0"
+                 link: experiments.experiment1.links.P2PLink1.id,
+                 connector: experiments.experiment1.links.P2PLink1.CONNECTOR_1,
+                 macAddr: "B1:B1:B1:B2:B2:B2",
+                 ipAddr: "10.10.1.1"
                 ],
+
+                //HUB zu Netz1
+                [virtual: true,
+                 lpName: "lp1",
+                 link: experiments.experiment1.links.Hub1.id,
+                 connector: experiments.experiment1.links.Hub1.HUB_PORT_4,
+                 macAddr: "11.11.11.1B.1B.1B",
+                 ipAddr: "192.168.1.1"
+                ],
+
+                //P2P zu router4
+                [virtual: true,
+                 lpName: "lp5",
+                 link: experiments.experiment1.links.P2PLink4.id,
+                 connector: experiments.experiment1.links.P2PLink4.CONNECTOR_2,
+                 macAddr: "B1:B1:B1:B4:B4:B4",
+                 ipAddr: "10.10.4.2"
+                ]
 
             ]
 
+            periodRInfo = 4
+
             routingTable = [
-                    ]
+                    ["192.168.1.0", "255.255.255.0", "192.168.1.1", "lp1"],
+                    ["10.10.1.0", "255.255.255.252", "10.10.1.1", "lp2"],
+                    ["10.10.4.0", "255.255.255.252", "10.10.4.2", "lp5"],
+
+             //       ["10.10.2.0", "255.255.255.252", "10.10.1.2", "lp2"],
+             //       ["10.10.2.0", "255.255.255.252", "10.10.4.1", "lp5"],
+
+             //       ["10.10.3.0", "255.255.255.252", "10.10.1.2", "lp2"],
+             //       ["10.10.3.0", "255.255.255.252", "10.10.4.1", "lp5"],
+
+                    ["192.168.2.0", "255.255.255.0", "10.10.1.2", "lp2"],
+             //       ["192.168.2.0", "255.255.255.0", "10.10.4.1", "lp5"],
+                            ]
 
             arpTable = [:]
 
             // Hier sind die IP-Adressen der benachbarten Router einzutragen
-            neighborTable = []
+            // [["1.2.3.4", 11],["5,6,7.8", 20]]
+            neighborTable = [["10,10,1.2", 5522],["10.10.4.1", 5544]]
         }
         //=============================================================================================
 
         router2 {
             // Eigene TCP- und UDP-Portnummer
-            ownPort = 0
+            ownPort = 5522
 
             networkConnectors = [
+
+                //P2P zu router1
                 [virtual: true,
-                 lpName: "",
-                 link: 0,
-                 connector: 0,
-                 macAddr: "00:00:00:00:00:00",
-                 ipAddr: "0.0.0.0"
+                 lpName: "lp2",
+                 link: experiments.experiment1.links.P2PLink1.id,
+                 connector: experiments.experiment1.links.P2PLink1.CONNECTOR_2,
+                 macAddr: "B2:B2:B2:B1:B1:B1",
+                 ipAddr: "10.10.1.2"
                 ],
 
+                //P2P zu router3
                 [virtual: true,
-                 lpName: "",
-                 link: 0,
-                 connector: 0,
-                 macAddr: "00:00:00:00:00:00",
-                 ipAddr: "0.0.0.0"
-                ],
+                 lpName: "lp3",
+                 link: experiments.experiment1.links.P2PLink2.id,
+                 connector: experiments.experiment1.links.P2PLink2.CONNECTOR_1,
+                 macAddr: "B2:B2:B2:B3:B3:B3",
+                 ipAddr: "10.10.2.1"
+                ]
 
             ]
 
             routingTable = [
-                    ]
+                ["10.10.1.0", "255.255.255.252", "10.10.1.2", "lp2"],
+                ["10.10.2.0", "255.255.255.252", "10.10.2.1", "lp3"],
+
+             //   ["10.10.3.0", "255.255.255.252", "10.10.2.2", "lp3"],
+             //   ["10.10.3.0", "255.255.255.252", "10.10.1.1", "lp2"],
+
+             //   ["10.10.4.0", "255.255.255.252", "10.10.1.1", "lp2"],
+             //   ["10.10.4.0", "255.255.255.252", "10.10.2.2", "lp3"],
+
+                ["192.168.1.0", "255.255.255.0", "10.10.1.1", "lp2"],
+
+                ["192.168.2.0", "255.255.255.0", "10.10.2.2", "lp3"],
+             //   ["192.168.2.0", "255.255.255.0", "10.10.1.1", "lp2"],
+
+            ]
 
             arpTable = [:]
 
-            neighborTable = []
+            neighborTable = [["10,10,1.1", 5511],["10.10.2.2", 5533]]
         }
         //=============================================================================================
 
         router3 {
             // Eigene TCP- und UDP-Portnummer
-            ownPort = 0
+            ownPort = 5533
 
             networkConnectors = [
+                //P2P zu router2
                 [virtual: true,
-                 lpName: "",
-                 link: 0,
-                 connector: 0,
-                 macAddr: "00:00:00:00:00:00",
-                 ipAddr: "0.0.0.0"
+                 lpName: "lp3",
+                 link: experiments.experiment1.links.P2PLink2.id,
+                 connector: experiments.experiment1.links.P2PLink2.CONNECTOR_2,
+                 macAddr: "B3:B3:B3:B2:B2:B2",
+                 ipAddr: "10.10.2.2"
                 ],
 
+                //HUB zu Netz2
                 [virtual: true,
-                 lpName: "",
-                 link: 0,
-                 connector: 0,
-                 macAddr: "00:00:00:00:00:00",
-                 ipAddr: "0.0.0.0"
+                 lpName: "lp6",
+                 link: experiments.experiment1.links.Hub2.id,
+                 connector: experiments.experiment1.links.Hub2.HUB_PORT_1,
+                 macAddr: "B3:B3:B3:22:22:22",
+                 ipAddr: "192.168.2.1"
+                ],
+
+                //P2P zu router4
+                [virtual: true,
+                 lpName: "lp4",
+                 link: experiments.experiment1.links.P2PLink3.id,
+                 connector: experiments.experiment1.links.P2PLink3.CONNECTOR_1,
+                 macAddr: "B3:B3:B3:B4:B4:B4",
+                 ipAddr: "10.10.3.1"
                 ],
 
             ]
 
             routingTable = [
+            ["192.168.2.0","255.255.255.0","192.168.2.1","lp6"],
+            ["10.10.2.0","255.255.255.252","10.10.2.2","lp3"],
+            ["10.10.3.0","255.255.255.252","10.10.3.1","lp4"],
+
+            ["192.168.1.0","255.255.255.0","10.10.2.1","lp3"]
+         //   ["192.168.1.0","255.255.255.0","10.10.3.2","lp4"]
+
                     ]
 
             arpTable = [:]
 
-            neighborTable = []
+            neighborTable = [["10,10,2.1", 5522],["10.10.3.2", 5544]]
         }
         //=============================================================================================
 
         router4 {
             // Eigene TCP- und UDP-Portnummer
-            ownPort = 0
+            ownPort = 5544
 
             networkConnectors = [
                 [virtual: true,
-                 lpName: "",
-                 link: 0,
-                 connector: 0,
-                 macAddr: "00:00:00:00:00:00",
-                 ipAddr: "0.0.0.0"
+                 lpName: "lp4",
+                 link: experiments.experiment1.links.P2PLink3.id,
+                 connector: experiments.experiment1.links.P2PLink3.CONNECTOR_2,
+                 macAddr: "B4:B4:B4:B3:B3:B3",
+                 ipAddr: "10.10.3.2"
                 ],
 
                 [virtual: true,
-                 lpName: "",
-                 link: 0,
-                 connector: 0,
-                 macAddr: "00:00:00:00:00:00",
-                 ipAddr: "0.0.0.0"
+                 lpName: "lp5",
+                 link: experiments.experiment1.links.P2PLink4.id,
+                 connector: experiments.experiment1.links.P2PLink4.CONNECTOR_1,
+                 macAddr: "B4:B4:B4:B1:B1:B1",
+                 ipAddr: "10.10.4.1"
                 ],
 
             ]
 
             routingTable = [
+            ["10.10.3.0","255.255.255.252","10.10.3.2","lp4"],
+            ["10.10.4.0","255.255.255.252","10.10.4.1","lp5"],
+
+            ["192.168.1.0","255.255.255.0","10.10.4.2","lp5"],
+            ["192.168.2.0","255.255.255.0","10.10.3.1","lp4"]
+
                     ]
 
             arpTable = [:]
 
-            neighborTable = []
+            neighborTable = [["10,10,4.2", 5511],["10.10.3.1", 5533]]
         }
     }
 
