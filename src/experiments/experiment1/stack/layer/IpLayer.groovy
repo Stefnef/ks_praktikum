@@ -137,7 +137,7 @@ class IpLayer {
                     // Ist es eine direkte Route?
                     if (nextHopAddr == ownIpAddrs[linkPortName])
                         // Ja
-                        il_idu.nextHopAddr = nextHopAddr
+                        il_idu.nextHopAddr = i_pdu.dstIpAddr
                     else
                         // Nein
                         il_idu.nextHopAddr = nextHopAddr
