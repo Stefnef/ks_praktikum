@@ -57,7 +57,7 @@ class Router2 {
 
         // Konfiguration holen
         config = Utils.getConfig("experiment1", "router2")
-
+        //neighborTable = config.neighborTable
         // ------------------------------------------------------------
 
         // Netzwerkstack initialisieren
@@ -100,7 +100,7 @@ class Router2 {
         (iPAddr, port, rInfo) = stack.udpReceive()
 
 
-        Utils.writeLog("NameServer", "nameserver", "empfängt von $iPAddr:$port: $rInfo ", 3)
+        Utils.writeLog("Router2", "router2", "empfängt von $iPAddr:$port: $rInfo ", 3)
         // Jetzt aktuelle Routingtablle holen:
         // rt = stack.getRoutingtable()
         // neue Routinginformationen bestimmen
@@ -120,7 +120,18 @@ class Router2 {
     void sendPeriodical() {
         // Paket mit Routinginformationen packen
         // ... z.B.
-        // routingTable = stack.getRoutingTable()
+        routingTable = stack.getRoutingTable()
+        Utils.writeLog("Router", "router2", " hat Routing TABELLE $routingTable", 3)
+
+        for (List route in routingTable) {
+            //Utils.writeLog("Router1", "router1", " Routing-Eintrag: ${route[0]} - ${route[1]} - ${route[2]} - ${route[3]}", 3)
+            //für jede Route prüfe, ob Nachbar existiert
+            //ja, nicht propagieren
+            //nein, Route senden (damit nur Netz1 und Netz2, kein Backbone)
+            //senden, Router ist nextHop für dieses jeweilige Netz
+
+        }
+
         // extrahieren von Information, dann iInfo als !Zeichenkette! erzeugen ...
         String rInfo = "inf1a, inf1b, ..., inf2a, inf2b, ..."
 
@@ -138,8 +149,7 @@ class Router2 {
     void sendToNeigbors(String rInfo) {
         // rInfo an alle Nachbarrouter versenden
         for (List neigbor in neighborTable) {
-            stack.udpSend(dstIpAddr: neigbor[0], dstPort: neigbor[1],
-                    srcPort: config.ownPort, sdu: rInfo)
+            stack.udpSend(dstIpAddr: neigbor[0], dstPort: neigbor[1], srcPort: config.ownPort, sdu: rInfo)
         }
     }
     //------------------------------------------------------------------------------

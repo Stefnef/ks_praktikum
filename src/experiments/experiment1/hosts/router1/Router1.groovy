@@ -31,6 +31,9 @@ class Router1 {
     /** Eine Arbeitskopie der Routingtabelle der Netzwerkschicht */
     List routingTable
 
+    /** Eigene IP-Adressen (eine IPv4-Adresse je Anschluss) */
+    Map<String, String> ownIpAddrs = [:]
+
     //========================================================================================================
     // Methoden ANFANG
     //========================================================================================================
@@ -44,6 +47,8 @@ class Router1 {
         Router1 application = new Router1()
         // und starten
         application.router()
+
+
     }
     //------------------------------------------------------------------------------
 
@@ -57,7 +62,12 @@ class Router1 {
 
         // Konfiguration holen
         config = Utils.getConfig("experiment1", "router1")
+        neighborTable = config.neighborTable
 
+        config.networkConnectors.each { conn ->
+            ownIpAddrs[conn.lpName] = conn.ipAddr
+
+        }
         // ------------------------------------------------------------
 
         // Netzwerkstack initialisieren
@@ -96,33 +106,77 @@ class Router1 {
         /** Empfangene Routinginformationen */
         String rInfo
 
-        // Auf UDP-Empfang warten
-        (iPAddr, port, rInfo) = stack.udpReceive()
+        while (true) {
+            // Auf UDP-Empfang warten
+            (iPAddr, port, rInfo) = stack.udpReceive()
 
-        Utils.writeLog("NameServer", "nameserver", "empfängt von $iPAddr:$port: $rInfo ", 3)
+            Utils.writeLog("Router", "router1", "empfängt von $iPAddr:$port: $rInfo ", 3)
 
-        // Jetzt aktuelle Routingtablle holen:
-        // rt = stack.getRoutingtable()
-        // neue Routinginformationen bestimmen
-        //    zum Zerlegen einer Zeichenkette siehe "tokenize()"
-        // extrahieren von Information, dann iInfo als !Zeichenkette! erzeugen ...
-        // Routingtabelle an Vermittlungsschicht uebergeben:
-        // stack.setRoutingtable(rt)
-        // und neue Routinginformationen verteilen:
-        // rInfo = ...
-        // sendToNeigbors(rInfo)
-        // oder periodisch verteilen lassen
+            //Jetzt aktuelle Routingtablle holen:
+            //rt = stack.getRoutingtable()
+            //Utils.writeLog("Router", "router1", "holen aus Routingtabelle: $rt", 3)
+            //neue Routinginformationen bestimmen
+            //ist der nextHop der empf. Route Teil meiner Netze
+            //nein, verwerfe Route
+            //ja, füge Route zur Routingtabelle hinzu
+
+            //zum Zerlegen einer Zeichenkette siehe "tokenize()"
+
+            //extrahieren von Information, dann iInfo als !Zeichenkette! erzeugen ...
+            //Routingtabelle an Vermittlungsschicht uebergeben:
+            //stack.setRoutingtable(rt)
+            //und neue Routinginformationen verteilen:
+            //rInfo = ...
+            //sendToNeigbors(rInfo)
+            //oder periodisch verteilen lassen
+        }
+    }
+    // ------------------------------------------------------------
+
+    //stantsch: ermittelt ob keine direkte Route existiert
+    boolean existsDirectRouting(String ipAdress){
+
+        return true
     }
 
     // ------------------------------------------------------------
 
     /** Periodisches Senden der Routinginformationen */
     void sendPeriodical() {
+        List neigbr
+        String rInfo
         // Paket mit Routinginformationen packen
         // ... z.B.
-        // routingTable = stack.getRoutingTable()
+        routingTable = stack.getRoutingTable()
+        Utils.writeLog("Router", "router1", " hat Routing TABELLE $routingTable", 3)
+
+        rInfo = ""
+        for (List route in routingTable) {
+            //Utils.writeLog("Router1", "router1", " Routing-Eintrag: ${route[0]} - ${route[1]} - ${route[2]} - ${route[3]}", 3)
+            //für jede Route prüfe, ob Nachbar existiert
+            neigbr = neighborTable.find {
+                entry -> Utils.getNetworkId(entry[0], route[1] as String) == route[0]
+            }
+            //ja ist Backbone, nicht propagieren
+            //nein, kein Backbone - Route senden (und damit nur Netz1 und Netz2 propagieren aber kein Backbone)
+            if (!neigbr) {
+                Utils.writeLog("Router1", "router1", " Propagiere Route: ${route}", 3)
+                //senden, Router ist nextHop für dieses jeweilige Netz
+                //192.168.1.0/24 10.10.1.1 lp2
+                //192.168.1.0/24 10.10.4.2 lp5
+                //192.168.2.0/24 10.10.1.1 lp5
+                //192.168.2.0/24 10.10.4.2 lp2
+
+                for (List neigbor in neighborTable) {
+                        rInfo += "[${route[0]}, ${route[1]}, bbIPs, lpX],"
+                }
+            }
+
+
+        }
+
         // extrahieren von Information, dann iInfo als !Zeichenkette! erzeugen ...
-        String rInfo = "inf1a, inf1b, ..., inf2a, inf2b, ..."
+        //rInfo = "inf1a, inf1b, ..., inf2a, inf2b, ..."
 
         // Zum Senden uebergeben
         sendToNeigbors(rInfo)
@@ -138,8 +192,8 @@ class Router1 {
     void sendToNeigbors(String rInfo) {
         // rInfo an alle Nachbarrouter versenden
         for (List neigbor in neighborTable) {
-            stack.udpSend(dstIpAddr: neigbor[0], dstPort: neigbor[1],
-                    srcPort: config.ownPort, sdu: rInfo)
+            Utils.writeLog("Router", "router1", "sende an Nachbar: ${neigbor[0]} Info: $rInfo", 3)
+            stack.udpSend(dstIpAddr: neigbor[0], dstPort: neigbor[1], srcPort: config.ownPort, sdu: rInfo)
         }
     }
     //------------------------------------------------------------------------------
