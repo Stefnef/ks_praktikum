@@ -25,7 +25,13 @@ timeOut = deltaTimeOut * 5 // Timeout fuer Sendewiederholung
 globalNetMask = "255.255.255.0"
 
 // Zeitabstand in Sekunden, in dem von Routern periodisch Routinginformationen verschickt werden
-periodRInfo = 2
+periodRInfo = 2000
+
+//Info message von Router2
+rInfo = "Hello world! :)"
+
+//counterR2
+counterR2 = 2
 
 // Auswahl einer Ablaufumgebung durch Setzen der Konstanten "environment"
 environments {
@@ -34,6 +40,7 @@ environments {
     // Lokale Arbeit, Verwendung von client1/server1 oder client2/server2
 
     LOCAL {
+
         client {
             // IP-Adresse des Web-Servers
             serverIpAddr = "192.168.1.80"
@@ -199,7 +206,8 @@ environments {
 
             ]
 
-            periodRInfo = 4
+            routingAlternative = ["192.168.1.0", "255.255.255.0", "192.168.4.2", "lp5"]
+            routingRemoved = ["192.168.2.0", "255.255.255.0", "10.10.1.2", "lp2"]
 
             routingTable = [
                     ["192.168.1.0", "255.255.255.0", "192.168.1.1", "lp1"],
@@ -220,7 +228,7 @@ environments {
 
             // Hier sind die IP-Adressen der benachbarten Router einzutragen
             // [["1.2.3.4", 11],["5,6,7.8", 20]]
-            neighborTable = [["10,10,1.2", 5522],["10.10.4.1", 5544]]
+            neighborTable = [["10.10.1.2", 5522],["10.10.4.1", 5544]]
         }
         //=============================================================================================
 
@@ -269,7 +277,7 @@ environments {
 
             arpTable = [:]
 
-            neighborTable = [["10,10,1.1", 5511],["10.10.2.2", 5533]]
+            neighborTable = [["10.10.1.1", 5511],["10.10.2.2", 5533]]
         }
         //=============================================================================================
 
@@ -307,6 +315,9 @@ environments {
 
             ]
 
+            routingAlternative = ["192.168.1.0", "255.255.255.0", "192.168.4.2", "lp5"]
+            routingRemoved = ["10.10.2.0","255.255.255.252","10.10.2.2","lp3"]
+
             routingTable = [
             ["192.168.2.0","255.255.255.0","192.168.2.1","lp6"],
             ["10.10.2.0","255.255.255.252","10.10.2.2","lp3"],
@@ -319,7 +330,7 @@ environments {
 
             arpTable = [:]
 
-            neighborTable = [["10,10,2.1", 5522],["10.10.3.2", 5544]]
+            neighborTable = [["10.10.2.1", 5522],["10.10.3.2", 5544]]
         }
         //=============================================================================================
 
@@ -357,7 +368,7 @@ environments {
 
             arpTable = [:]
 
-            neighborTable = [["10,10,4.2", 5511],["10.10.3.1", 5533]]
+            neighborTable = [["10.10.4.2", 5511],["10.10.3.1", 5533]]
         }
     }
 
