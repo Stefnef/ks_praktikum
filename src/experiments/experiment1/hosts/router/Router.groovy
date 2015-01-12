@@ -107,12 +107,16 @@ class Router {
 
             //Jetzt aktuelle Routingtablle holen:
             List< List<String> > rt = stack.getRoutingTable()
+            List< List<String> > nrt = stack.getRoutingTable()
+
             Utils.writeLog("Router", routerNr, "holen aus Routingtabelle: $rt", 3)
             //neue Routinginformationen bestimmen
 
             //ist der nextHop der empf. Route Teil meiner Netze
             //nein, verwerfe Route
             //ja, füge Route zur Routingtabelle hinzu
+
+
 
             //zum Zerlegen einer Zeichenkette siehe "tokenize()"
             def rInfoList = rInfo.tokenize(";")
@@ -121,21 +125,18 @@ class Router {
                 def entryList = entry.tokenize(",")
                 Utils.writeLog("Router", routerNr, "...entryList: $entryList ", 3)
 
-
-
                 for (List route in rt) {
+
                     if (Utils.getNetworkId(entryList[2], route[1] as String) == route[0]){
-
+                        found = rt.find{result -> result[0] == entry[0] && result[1]==entry[1]}
+                        nrt.add(entryList)
                     }
-                    // in Routingtabelle einfügen
-                    rt.add(entryList);
-
                 }
 
-                Utils.writeLog("Router", routerNr, "holen aus Routingtabelle: $rt", 3)
+                Utils.writeLog("Router", routerNr, "Neue Routingtabelle: $nrt", 3)
             }
 
-            stack.setRoutingTable(rt)
+            stack.setRoutingTable(nrt)
             //extrahieren von Information, dann iInfo als !Zeichenkette! erzeugen ...
             //Routingtabelle an Vermittlungsschicht uebergeben:
             //stack.setRoutingtable(rt)
@@ -192,7 +193,7 @@ class Router {
                     // Backbone IP-Adress behind
                     bbip = ownIpAddrs[lp]
                     //metric
-                    metric = route[4]+1
+                    metric = (route[4] as int)+1
                     if (rInfo) rInfo += ";"
                     rInfo += "${route[0]},${route[1]},${bbip},${lp},${metric}"
                 }
