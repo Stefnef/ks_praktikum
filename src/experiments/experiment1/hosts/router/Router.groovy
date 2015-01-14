@@ -107,8 +107,7 @@ class Router {
 
             //Jetzt aktuelle Routingtablle holen:
             List< List<String> > rt = stack.getRoutingTable()
-            List< List<String> > nrt = stack.getRoutingTable()
-
+            List<List<String>> tempRoutingTable = stack.getRoutingTable()
             Utils.writeLog("Router", routerNr, "holen aus Routingtabelle: $rt", 3)
             //neue Routinginformationen bestimmen
 
@@ -116,27 +115,47 @@ class Router {
             //nein, verwerfe Route
             //ja, füge Route zur Routingtabelle hinzu
 
-
-
             //zum Zerlegen einer Zeichenkette siehe "tokenize()"
             def rInfoList = rInfo.tokenize(";")
             Utils.writeLog("Router", routerNr, "tokenize: $rInfoList", 3)
-            for(String entry : rInfoList) {
-                def entryList = entry.tokenize(",")
-                Utils.writeLog("Router", routerNr, "...entryList: $entryList ", 3)
+            for(String newRoutingRowString : rInfoList) {
+                def newRoutingRow = newRoutingRowString.tokenize(",")
+                Utils.writeLog("Router", routerNr, "...newRoutingRow: $newRoutingRow ", 3)
 
                 for (List route in rt) {
+                    if (Utils.getNetworkId(newRoutingRow[2], route[1] as String) == route[0]){
+                        List<List<String>> foundRoutingRows = rt.findAll({
+                            routeEntry -> routeEntry[0] == newRoutingRow[0] &&
+                                    routeEntry[1] == newRoutingRow[1] })
 
-                    if (Utils.getNetworkId(entryList[2], route[1] as String) == route[0]){
-                        found = rt.find{result -> result[0] == entry[0] && result[1]==entry[1]}
-                        nrt.add(entryList)
+                        //wenn Eintrag in Routingtabelle bereits vorhanden, dann Metriken vergleichen
+                        if(!foundRoutingRows.isEmpty()) {
+                            for(List<String> oldRoutingRow : foundRoutingRows) {
+                                //ist die Metrik aus dem Eintrag in der Routingtabelle schlechter?
+                                if (oldRoutingRow[4] > newRoutingRow[4]) {
+                                    tempRoutingTable.remove(oldRoutingRow)
+                                    tempRoutingTable.add(newRoutingRow)
+                                    Utils.writeLog("Router", routerNr, "...ersetzt: $oldRoutingRow durch $newRoutingRow ", 3)
+                                } else if ( (oldRoutingRow[4] == newRoutingRow[4])
+                                        && (oldRoutingRow[2] != newRoutingRow[2])){
+                                    //sind Metriken identisch und ist es nicht der gleiche Eintrag?
+                                    //-> ja => Eintrag zur Routingtabelle hinzufügen
+                                    tempRoutingTable.add(newRoutingRow)
+                                    Utils.writeLog("Router", routerNr, "...hinzugefügt (gleiche Metrik): $newRoutingRow ", 3)
+                                }
+                            }
+                        }
+                        else{
+                            tempRoutingTable.add(newRoutingRow)
+                            Utils.writeLog("Router", routerNr, "...hinzugefügt: $newRoutingRow ", 3)
+                        }
                     }
                 }
-
-                Utils.writeLog("Router", routerNr, "Neue Routingtabelle: $nrt", 3)
+                tempRoutingTable.unique()
+                Utils.writeLog("Router", routerNr, "neue Routingtabelle: $tempRoutingTable", 3)
             }
 
-            stack.setRoutingTable(nrt)
+            stack.setRoutingTable(tempRoutingTable)
             //extrahieren von Information, dann iInfo als !Zeichenkette! erzeugen ...
             //Routingtabelle an Vermittlungsschicht uebergeben:
             //stack.setRoutingtable(rt)
@@ -194,7 +213,8 @@ class Router {
                     bbip = ownIpAddrs[lp]
                     //metric
                     metric = (route[4] as int)+1
-                    if (rInfo) rInfo += ";"
+                    if (rInfo)
+                        rInfo += ";"
                     rInfo += "${route[0]},${route[1]},${bbip},${lp},${metric}"
                 }
             }
