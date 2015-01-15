@@ -25,7 +25,8 @@ timeOut = deltaTimeOut * 5 // Timeout fuer Sendewiederholung
 globalNetMask = "255.255.255.0"
 
 // Zeitabstand in Sekunden, in dem von Routern periodisch Routinginformationen verschickt werden
-periodRInfo = 2
+periodRInfo = 10000
+lifeTime = 6 // lifeTime = x * periodRInfo
 
 // Auswahl einer Ablaufumgebung durch Setzen der Konstanten "environment"
 environments {
@@ -199,7 +200,6 @@ environments {
 
             ]
 
-            periodRInfo = 30000
 
             routingTable = [
                     ["192.168.1.0", "255.255.255.0", "192.168.1.1", "lp1", 0],
@@ -220,14 +220,13 @@ environments {
 
             // Hier sind die IP-Adressen der benachbarten Router einzutragen
             // [["1.2.3.4", 11],["5,6,7.8", 20]]
-            neighborTable = [["10.10.1.2", 5522, "lp2"],["10.10.4.1", 5544, "lp5"]]
+            neighborTable = [["10.10.1.2", 5522, "lp2", lifeTime],["10.10.4.1", 5544, "lp5", lifeTime]]
         }
         //=============================================================================================
 
         router2 {
             // Eigene TCP- und UDP-Portnummer
             ownPort = 5522
-            periodRInfo = 30000
 
             networkConnectors = [
 
@@ -268,14 +267,13 @@ environments {
 
             arpTable = [:]
 
-            neighborTable = [["10.10.1.1", 5511, "lp2"],["10.10.2.2", 5533, "lp3"]]
+            neighborTable = [["10.10.1.1", 5511, "lp2", lifeTime],["10.10.2.2", 5533, "lp3", lifeTime]]
         }
         //=============================================================================================
 
         router3 {
             // Eigene TCP- und UDP-Portnummer
             ownPort = 5533
-            periodRInfo = 10000
 
             networkConnectors = [
                 //P2P zu router2
@@ -318,14 +316,13 @@ environments {
 
             arpTable = [:]
 
-            neighborTable = [["10.10.2.1", 5522, "lp3"],["10.10.3.2", 5544, "lp4"]]
+            neighborTable = [["10.10.2.1", 5522, "lp3", lifeTime],["10.10.3.2", 5544, "lp4", lifeTime]]
         }
         //=============================================================================================
 
         router4 {
             // Eigene TCP- und UDP-Portnummer
             ownPort = 5544
-            periodRInfo = 10000
 
             networkConnectors = [
                 [virtual: true,
@@ -357,7 +354,7 @@ environments {
 
             arpTable = [:]
 
-            neighborTable = [["10.10.4.2", 5511, "lp5"],["10.10.3.1", 5533, "lp4"]]
+            neighborTable = [["10.10.4.2", 5511, "lp5", lifeTime],["10.10.3.1", 5533, "lp4", lifeTime]]
         }
     }
 

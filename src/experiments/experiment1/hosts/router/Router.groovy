@@ -40,6 +40,8 @@ class Router {
     // Nummer des Routers
     String routerNr
 
+    int lifeTime
+
     //========================================================================================================
     // Methoden ANFANG
     //========================================================================================================
@@ -57,6 +59,7 @@ class Router {
         // Konfiguration holen
         config = Utils.getConfig("experiment1", routerNr)
         neighborTable = config.neighborTable
+        lifeTime = config.lifeTime
 
         config.networkConnectors.each { conn ->
             ownIpAddrs[conn.lpName] = conn.ipAddr
@@ -92,10 +95,8 @@ class Router {
     void receiveFromNeigbor() {
         /** IP-Adresse des Nachbarrouters */
         String iPAddr
-
         /** UDP-Portnummer des Nachbarrouters */
         int port
-
         /** Empfangene Routinginformationen */
         String rInfo
 
@@ -104,6 +105,14 @@ class Router {
             (iPAddr, port, rInfo) = stack.udpReceive()
 
             Utils.writeLog("Router", routerNr, "empfängt von $iPAddr:$port: $rInfo ", 3)
+
+            /* Nachbar Counter zurücksetzen
+            def ntx = neighborTable.find({
+                nt -> nt[0] == iPAddr
+
+            })
+            Utils.writeLog("Router", routerNr, "NTX: $ntx ", 3)
+            //ntx[3] = lifeTime*/
 
             //Jetzt aktuelle Routingtablle holen:
             List< List<String> > rt = stack.getRoutingTable()
@@ -123,13 +132,16 @@ class Router {
                 Utils.writeLog("Router", routerNr, "...newRoutingRow: $newRoutingRow ", 3)
 
                 for (List route in rt) {
+                    // passt der nextHop zu einem unserer Netze?
                     if (Utils.getNetworkId(newRoutingRow[2], route[1] as String) == route[0]){
+                        // finde alle Einträge die in der aktuellen RT, die zu der propagierten Route passen
                         List<List<String>> foundRoutingRows = rt.findAll({
                             routeEntry -> routeEntry[0] == newRoutingRow[0] &&
                                     routeEntry[1] == newRoutingRow[1] })
 
-                        //wenn Eintrag in Routingtabelle bereits vorhanden, dann Metriken vergleichen
+                        // wenn Eintrag in Routingtabelle bereits vorhanden, dann Metriken vergleichen
                         if(!foundRoutingRows.isEmpty()) {
+                            // gehe durch alle passenden Routen in der akt. RT durch
                             for(List<String> oldRoutingRow : foundRoutingRows) {
                                 //ist die Metrik aus dem Eintrag in der Routingtabelle schlechter?
                                 if (oldRoutingRow[4] > newRoutingRow[4]) {
@@ -137,15 +149,14 @@ class Router {
                                     tempRoutingTable.add(newRoutingRow)
                                     Utils.writeLog("Router", routerNr, "...ersetzt: $oldRoutingRow durch $newRoutingRow ", 3)
                                 } else if ( (oldRoutingRow[4] == newRoutingRow[4])
-                                        && (oldRoutingRow[2] != newRoutingRow[2])){
+                                        && (oldRoutingRow != newRoutingRow)){
                                     //sind Metriken identisch und ist es nicht der gleiche Eintrag?
                                     //-> ja => Eintrag zur Routingtabelle hinzufügen
                                     tempRoutingTable.add(newRoutingRow)
                                     Utils.writeLog("Router", routerNr, "...hinzugefügt (gleiche Metrik): $newRoutingRow ", 3)
                                 }
                             }
-                        }
-                        else{
+                        } else {
                             tempRoutingTable.add(newRoutingRow)
                             Utils.writeLog("Router", routerNr, "...hinzugefügt: $newRoutingRow ", 3)
                         }
@@ -165,13 +176,6 @@ class Router {
             //oder periodisch verteilen lassen
         }
     }
-    // ------------------------------------------------------------
-
-    //stantsch: ermittelt ob keine direkte Route existiert
-    boolean existsDirectRouting(String ipAdress){
-
-        return true
-    }
 
     // ------------------------------------------------------------
 
@@ -180,13 +184,35 @@ class Router {
         List neigbr
         String rInfo, bbip, lp
         int metric
+        def foundRoutingRows
         // Paket mit Routinginformationen packen
         // ... z.B.
         routingTable = stack.getRoutingTable()
         Utils.writeLog("Router", routerNr, " hat Routing TABELLE $routingTable", 3)
 
-        rInfo = ""
+        //lösche offline Nachbarn
+        // für alle Nachbarn in NT
+        for (List neighbour in neighborTable) {
+            // ist Nachbar tot?
+            if (!neighbour[3]){
+                //ja, Routen löschen
+                foundRoutingRows = routingTable.findAll({
+                    // alle Einträge mit Anschluss lpX
+                    rrow -> rrow[3] == neighbour[2] &&
+                    // die nicht Backbone sind
+                    Utils.getNetworkId(neighbour[0], rrow[1] as String) != rrow[0]
+                })
+                Utils.writeLog("Router", routerNr, " zu löschende Einträge in RT: $foundRoutingRows", 3)
+                routingTable.removeAll(foundRoutingRows)
+                stack.setRoutingTable(routingTable)
 
+            } else { // nein, runterzählen
+                neighbour[3]--
+            }
+        }
+
+        rInfo = ""
+        // für alle Einträge in Routing Tabelle
         for (List route in routingTable) {
             //Utils.writeLog("Router1", "router1", " Routing-Eintrag: ${route[0]} - ${route[1]} - ${route[2]} - ${route[3]}", 3)
             //für jede Route prüfe, ob Nachbar existiert
