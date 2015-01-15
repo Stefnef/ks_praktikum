@@ -26,7 +26,7 @@ globalNetMask = "255.255.255.0"
 
 // Zeitabstand in Sekunden, in dem von Routern periodisch Routinginformationen verschickt werden
 periodRInfo = 10000
-lifeTime = 6 // lifeTime = x * periodRInfo
+lifeTime = 3 // lifeTime = x * periodRInfo
 
 // Auswahl einer Ablaufumgebung durch Setzen der Konstanten "environment"
 environments {

@@ -106,13 +106,14 @@ class Router {
 
             Utils.writeLog("Router", routerNr, "empfängt von $iPAddr:$port: $rInfo ", 3)
 
-            /* Nachbar Counter zurücksetzen
-            def ntx = neighborTable.find({
-                nt -> nt[0] == iPAddr
+            // Nachbar Counter zurücksetzen
+            for ( List nt in neighborTable){
+                if (nt[0] == iPAddr) {
+                    nt[3] = lifeTime
+                }
+            }
+            Utils.writeLog("Router", routerNr, "NT: $neighborTable ", 3)
 
-            })
-            Utils.writeLog("Router", routerNr, "NTX: $ntx ", 3)
-            //ntx[3] = lifeTime*/
 
             //Jetzt aktuelle Routingtablle holen:
             List< List<String> > rt = stack.getRoutingTable()
