@@ -11,6 +11,7 @@ import experiments.experiment1.stack.layer.pdu.I_PDU
 import experiments.experiment1.stack.layer.pdu.L_PDU
 
 import java.util.concurrent.LinkedBlockingQueue as MQueue
+import java.util.concurrent.TimeUnit
 
 /**
  * Die Link-Schicht (MAC-Framing und ARP)
@@ -280,15 +281,17 @@ class LinkLayer {
 
                 Utils.writeLog("LinkLayer", "send", "sendet ARP-Request: ${lc_idu}", 5)
 
-                // MAC_Frame mit ARP-PDU an Anschluss uebergeben
-                connector.send(lc_idu)
+                String nextMacAddr = null
+                while(nextMacAddr == null){
+                    // MAC_Frame mit ARP-PDU an Anschluss uebergeben
+                    connector.send(lc_idu)
 
-                // Warten auf ARP-Response, receive-Thread uebergibt die MAC-Adresse aus einem
-                // ARP-Reply ueber "arpQ"
-                // Der Sendethread blockiert hier: "quick and dirty"
-                // Besser waere es einen eigenen Thread auszufueren
-                String nextMacAddr = arpQ.take()
-
+                    // Warten auf ARP-Response, receive-Thread uebergibt die MAC-Adresse aus einem
+                    // ARP-Reply ueber "arpQ"
+                    // Der Sendethread blockiert hier: "quick and dirty"
+                    // Besser waere es einen eigenen Thread auszufueren
+                    nextMacAddr = arpQ.poll(1, TimeUnit.SECONDS)
+                }
                 // Arp-Tabelle aktualisieren
                 arpTable[il_idu.nextHopAddr] = nextMacAddr
                 // MAC-Ziel-Adresse in MAC-Frame einsetzen
