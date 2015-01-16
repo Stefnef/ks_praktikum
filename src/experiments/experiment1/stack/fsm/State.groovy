@@ -49,4 +49,25 @@ class State {
     /** Daten werden gesendet */
     static final int S_SEND_DATA = 250
 
+    static String s(int state) {
+        switch (state) {
+            case (S_IDLE) : return "S_IDLE"
+            case (S_WAIT_SYN_ACK) : return "S_WAIT_SYN_ACK"
+            case (S_READY) : return "S_READY"
+            case (S_SEND_SYN_ACK_ACK) : return "S_SEND_SYN_ACK_ACK"
+            case (S_WAIT_FIN_ACK) : return "S_WAIT_FIN_ACK"
+            case (S_SEND_FIN_ACK_ACK) : return "S_SEND_FIN_ACK_ACK"
+            case (S_RCVD_DATA) : return "S_RCVD_DATA"
+            case (S_RCVD_ACK ) : return "S_RCVD_ACK"
+            case (S_SEND_SYN): return "S_SEND_SYN"
+            case (S_SEND_SYN_ACK) : return "S_SEND_SYN_ACK"
+            case (S_WAIT_SYN_ACK_ACK) : return "S_WAIT_SYN_ACK_ACK"
+            case (S_SEND_FIN) : return "S_SEND_FIN"
+            case (S_SEND_FIN_ACK) : return "S_SEND_FIN_ACK"
+            case (S_WAIT_FIN_ACK_ACK) : return "S_WAIT_FIN_ACK_ACK"
+            case (S_SEND_DATA) : return "S_SEND_DATA"
+        }
+        return "State unbekannt"
+    }
+
 }

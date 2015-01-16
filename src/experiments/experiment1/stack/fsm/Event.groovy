@@ -58,4 +58,28 @@ class Event {
     /** FIN empfangen */
     static final int E_RCVD_FIN = 280
 
+    static String s(int event) {
+        switch (event) {
+            case (E_CONN_REQ) : return "E_CONN_REQ"
+            case (E_SEND_SYN) : return "E_SEND_SYN"
+            case (E_RCVD_SYN) : return "E_RCVD_SYN"
+            case (E_SEND_FIN) : return "E_SEND_FIN"
+            case (E_SEND_FIN_ACK) : return "E_SEND_FIN_ACK"
+            case (E_SEND_SYN_ACK) : return "E_SEND_SYN_ACK"
+            case (E_SEND_DATA) : return "E_SEND_DATA"
+            case (E_RCVD_SYN_ACK) : return "E_RCVD_SYN_ACK"
+            case (E_RCVD_SYN_ACK_ACK) : return "E_RCVD_SYN_ACK_ACK"
+            case (E_RCVD_DATA) : return "E_RCVD_DATA"
+            case (E_RCVD_ACK ) : return "E_RCVD_ACK"
+            case (E_SYN_ACK_ACK_SENT) : return "E_SYN_ACK_ACK_SENT"
+            case (E_RCVD_FIN_ACK_ACK) : return "E_RCVD_FIN_ACK_ACK"
+            case (E_FIN_ACK_ACK_SENT) : return "E_FIN_ACK_ACK_SENT"
+            case (E_READY) : return "E_READY"
+            case (E_DISCONN_REQ) : return "E_DISCONN_REQ"
+            case (E_DATA_SENT) : return "E_DATA_SENT"
+            case (E_RCVD_FIN): return "E_RCVD_FIN"
+        }
+        return "Event unbekannt"
+    }
+
 }
