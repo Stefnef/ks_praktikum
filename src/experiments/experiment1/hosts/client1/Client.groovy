@@ -116,6 +116,7 @@ Host: www.sesam-strasse.com
         // IPv4-Adresse und Portnummer des HTTP-Dienstes
         serverIpAddr = config.serverIpAddr
         serverPort = config.serverPort
+
         // Eigener UDP-Port
         ownPort = config.ownPort
 

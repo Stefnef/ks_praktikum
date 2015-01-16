@@ -31,9 +31,11 @@ class Client {
 
     /** Ziel-IP-Adresse */
     String serverIpAddr
+    String nameServerIpAddr
 
     /** Zielportadresse */
     int serverPort
+    int nameServerPort
 
     // HTTP-Header fuer GET-Request
     String request =
@@ -42,6 +44,8 @@ GET /${config.document} HTTP/1.1
 Host: www.sesam-strasse.com
 
 """
+/** DNS-Request **/
+    String dns_request = config.serverName
 
     /** Eigene Portadresse */
     int ownPort
@@ -99,8 +103,7 @@ Host: www.sesam-strasse.com
      * Verwendet das TCP-Protokoll.
      */
     void client() {
-
-
+        
         // Konfiguration holen
         // erster Parameter: der Name des Verzeichnisses, der den Versuch enthält
         // zweiter Parameter: Name der Konfiguation fuer dieses Gerät in der Konfigurationsdatei
@@ -112,15 +115,36 @@ Host: www.sesam-strasse.com
         serverIpAddr = config.serverIpAddr
         serverPort = config.serverPort
 
+        // IPv4-Adresse und Portnummer des DNS
+        nameServerIpAddr = config.nameServerIpAddr
+        nameServerPort = config.nameServerPort
+
         // Netzwerkstack initialisieren
         stack = new Stack()
         stack.start(config)
 
         // ------------------------------------------------------------
 
-        Utils.writeLog("Client", "client", "startet", 1)
+        Utils.writeLog("Client", "client-tcp", "startet", 1)
 
         // ------------------------------------------------------------
+        String d1, d2
+        def rdata
+        // dummies
+
+        if (nameServerIpAddr) {
+            //sende DNS-Anfrage an Nameserver
+            stack.udpSend(dstIpAddr: nameServerIpAddr, dstPort: nameServerPort, srcPort: ownPort, sdu: dns_request)
+
+            //empfange IP-Adresse vom Nameserver
+
+            (d1, d2, rdata) = stack.udpReceive()
+
+            Utils.writeLog("Client", "client-tcp", "empfängt IP-Adresse: $rdata", 1)
+
+            //ersetze serverIpAdress mit IP-Adresse vom Nameserver
+            if (rdata) serverIpAddr = rdata
+        }
 
         // Eine TCP-Verbindung öffnen
         connId = stack.tcpOpen(dstIpAddr: serverIpAddr, dstPort: serverPort)
@@ -129,7 +153,7 @@ Host: www.sesam-strasse.com
         if (connId > 0) {
             // Ja
 
-            Utils.writeLog("Client", "client", "sendet: ${request}", 1)
+            Utils.writeLog("Client", "client-tcp", "sendet: ${request}", 1)
 
             // Datenempfang vorbereiten
             data = ""
@@ -152,7 +176,7 @@ Host: www.sesam-strasse.com
                 // A-PDU uebernehmen
                 apdu = tidu.sdu
 
-                Utils.writeLog("Client", "client", "empfängt: ${new String(apdu)}", 1)
+                Utils.writeLog("Client", "client-tcp", "empfängt: ${new String(apdu)}", 1)
 
                 // Daten ergänzen
                 data += new String(apdu)
@@ -162,7 +186,7 @@ Host: www.sesam-strasse.com
 
             } // while
 
-            if (data) Utils.writeLog("Client", "client", "HTTP-Body empfangen: ${data[bodyStart..-1]}", 1)
+            if (data) Utils.writeLog("Client", "client-tcp", "HTTP-Body empfangen: ${data[bodyStart..-1]}", 1)
         } // if
 
         // Verbindung schliessen
