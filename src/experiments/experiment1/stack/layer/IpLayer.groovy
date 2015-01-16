@@ -188,7 +188,7 @@ class IpLayer {
             linkPortName = "lp1"
             nextHopAddr = ownIpAddrs[linkPortName]
 
-            Utils.writeLog("IpLayer", "send", "ROUTING-TABLE: ${routingTable}", 4)
+            Utils.writeLog("IpLayer", "send", "|###|: ${routingTable}", 4)
 
             // Nächstes Gerät (next hop) auf dem Pfad zum Zielgerät suchen
             (linkPortName, nextHopAddr) = findNextHop(ti_idu.dstIpAddr)

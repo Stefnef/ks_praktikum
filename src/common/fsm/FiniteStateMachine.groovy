@@ -1,5 +1,7 @@
 package common.fsm
 
+import common.utils.Utils
+
 /**
  * Endliche Zustands Maschine. <p/>
  * Steuert die Zustandwechsel der TCP-Protokollmaschine<p/>
@@ -100,6 +102,10 @@ class FiniteStateMachine {
         Map transition = transitions[a_event] as Map
 
         int nextState = 0
+        Utils.writeLog("FSM", "fire", "event: ${a_event}", 2)
+        Utils.writeLog("FSM", "fire", "curr_stat: ${currentState}", 2)
+        Utils.writeLog("FSM", "fire", "next_stat_trans: ${transition[currentState]}", 2)
+        Utils.writeLog("FSM", "fire", "states: ${transition}", 2)
         if (transition[currentState]) {
             nextState = transition[currentState] as int
         }
@@ -107,7 +113,7 @@ class FiniteStateMachine {
         //assert nextState, "There is no transition from '${currentState}' to any other state"
         if (nextState)
             currentState = nextState
-
+        Utils.writeLog("FSM", "fire", "curr_stat: ${nextState}", 2)
         return nextState
     }
 

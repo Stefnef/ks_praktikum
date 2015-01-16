@@ -31,8 +31,20 @@ class State {
     /** SYN zur Verbindungseröffnung wird gesendet */
     static final int S_SEND_SYN = 230
 
+    /** SYN+ACK wurde gesendet*/
+    static final int S_SEND_SYN_ACK = 235
+
+    /** SYN+ACK+ACK warten auf*/
+    static final int S_WAIT_SYN_ACK_ACK = 238
+
     /** SYN zur Verbindungsbeendigung wird gesendet */
     static final int S_SEND_FIN = 240
+
+    /** FIN+ACK senden*/
+    static final int S_SEND_FIN_ACK = 245
+
+    /** FIN+ACK+ACk warten*/
+    static final int S_WAIT_FIN_ACK_ACK = 248
 
     /** Daten werden gesendet */
     static final int S_SEND_DATA = 250

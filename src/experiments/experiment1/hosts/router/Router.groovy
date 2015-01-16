@@ -112,13 +112,13 @@ class Router {
                     nt[3] = lifeTime
                 }
             }
-            Utils.writeLog("Router", routerNr, "NT: $neighborTable ", 3)
+            Utils.writeLog("Router", routerNr, "|+++|: $neighborTable ", 3)
 
 
             //Jetzt aktuelle Routingtablle holen:
             List< List<String> > rt = stack.getRoutingTable()
             List<List<String>> tempRoutingTable = stack.getRoutingTable()
-            Utils.writeLog("Router", routerNr, "holen aus Routingtabelle: $rt", 3)
+            //Utils.writeLog("Router", routerNr, "holen aus Routingtabelle: $rt", 3)
             //neue Routinginformationen bestimmen
 
             //ist der nextHop der empf. Route Teil meiner Netze
@@ -127,10 +127,10 @@ class Router {
 
             //zum Zerlegen einer Zeichenkette siehe "tokenize()"
             def rInfoList = rInfo.tokenize(";")
-            Utils.writeLog("Router", routerNr, "tokenize: $rInfoList", 3)
+            //Utils.writeLog("Router", routerNr, "tokenize: $rInfoList", 3)
             for(String newRoutingRowString : rInfoList) {
                 def newRoutingRow = newRoutingRowString.tokenize(",")
-                Utils.writeLog("Router", routerNr, "...newRoutingRow: $newRoutingRow ", 3)
+                //Utils.writeLog("Router", routerNr, "...newRoutingRow: $newRoutingRow ", 3)
 
                 for (List route in rt) {
                     // passt der nextHop zu einem unserer Netze?
@@ -148,25 +148,25 @@ class Router {
                                 if (oldRoutingRow[4] > newRoutingRow[4]) {
                                     tempRoutingTable.remove(oldRoutingRow)
                                     tempRoutingTable.add(newRoutingRow)
-                                    Utils.writeLog("Router", routerNr, "...ersetzt: $oldRoutingRow durch $newRoutingRow ", 3)
+                                    Utils.writeLog("Router", routerNr, "ersetze $oldRoutingRow durch $newRoutingRow ", 3)
                                 } else if ( (oldRoutingRow[4] == newRoutingRow[4])
                                         && (oldRoutingRow != newRoutingRow)){
                                     //sind Metriken identisch und ist es nicht der gleiche Eintrag?
                                     //-> ja => Eintrag zur Routingtabelle hinzufügen
                                     tempRoutingTable.add(newRoutingRow)
-                                    Utils.writeLog("Router", routerNr, "...hinzugefügt (gleiche Metrik): $newRoutingRow ", 3)
+                                    Utils.writeLog("Router", routerNr, "hinzugefügen von $newRoutingRow (gleiche Metrik)", 3)
                                 }
                             }
                         } else {
                             tempRoutingTable.add(newRoutingRow)
-                            Utils.writeLog("Router", routerNr, "...hinzugefügt: $newRoutingRow ", 3)
+                            Utils.writeLog("Router", routerNr, "hinzugefügen von $newRoutingRow ", 3)
                         }
                     }
                 }
                 tempRoutingTable.unique()
-                Utils.writeLog("Router", routerNr, "neue Routingtabelle: $tempRoutingTable", 3)
             }
 
+            Utils.writeLog("Router", routerNr, "¦###¦: $tempRoutingTable", 3)
             stack.setRoutingTable(tempRoutingTable)
             //extrahieren von Information, dann iInfo als !Zeichenkette! erzeugen ...
             //Routingtabelle an Vermittlungsschicht uebergeben:
@@ -189,7 +189,7 @@ class Router {
         // Paket mit Routinginformationen packen
         // ... z.B.
         routingTable = stack.getRoutingTable()
-        Utils.writeLog("Router", routerNr, " hat Routing TABELLE $routingTable", 3)
+        Utils.writeLog("Router", routerNr, "¦###¦: $routingTable", 3)
 
         //lösche offline Nachbarn
         // für alle Nachbarn in NT
@@ -203,7 +203,7 @@ class Router {
                     // die nicht Backbone sind
                     Utils.getNetworkId(neighbour[0], rrow[1] as String) != rrow[0]
                 })
-                Utils.writeLog("Router", routerNr, " zu löschende Einträge in RT: $foundRoutingRows", 3)
+                Utils.writeLog("Router", routerNr, "lösche aus RT: $foundRoutingRows", 3)
                 routingTable.removeAll(foundRoutingRows)
                 stack.setRoutingTable(routingTable)
 
@@ -223,7 +223,7 @@ class Router {
             //ja ist Backbone, nicht propagieren
             //nein, kein Backbone - Route senden (und damit nur Netz1 und Netz2 propagieren aber kein Backbone)
             if (!neigbr) {
-                Utils.writeLog("Router", routerNr, " Propagiere Route: ${route}", 3)
+                Utils.writeLog("Router", routerNr, "Propagiere Route: ${route}", 3)
                 //senden, Router ist nextHop für dieses jeweilige Netz
                 //192.168.1.0/24 10.10.1.1 lp2
                 //192.168.1.0/24 10.10.4.2 lp5
