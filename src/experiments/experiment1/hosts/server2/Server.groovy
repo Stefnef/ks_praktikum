@@ -113,7 +113,7 @@ Das Objekt ${->name} wurde angefragt!
 
                 // Auf Empfang warten
                 Map tidu = stack.tcpReceive(connId: connId)
-
+                Utils.writeLog("Server", "server", "empfängt tidu: ${tidu}", 1)
                 // Es wurden längere Zeit keine Daten empfangen oder die Datenlänge ist 0
                 // -> die TCP-Verbindung wird als geschlossen angenommen
                 if (!tidu.sdu)

@@ -41,7 +41,7 @@ class Client {
     String request =
             """\
 GET /${config.document} HTTP/1.1
-Host: www.sesam-strasse.com
+Host: www.domain.com
 
 """
 /** DNS-Request **/

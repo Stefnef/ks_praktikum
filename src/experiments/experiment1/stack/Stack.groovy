@@ -200,9 +200,10 @@ public class Stack {
      */
     Map tcpReceive(Map idu) {
         Map tidu = [:]
-
+        //Utils.writeLog("Server", "tcpReceive", "vor blockierendes Lesen ", 3)
         // Blockierendes Empfangen von TCP,
         TA_IDU ta_idu = fromTcpQ.poll(Utils.sec1, TimeUnit.MILLISECONDS)
+        //Utils.writeLog("Server", "tcpReceive", "blockierendes Lesen ${ta_idu} ", 3)
         // Timeout aufgetreten?
         if (ta_idu) {
             // Nein

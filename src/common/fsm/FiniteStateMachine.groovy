@@ -1,6 +1,8 @@
 package common.fsm
 
 import common.utils.Utils
+import experiments.experiment1.stack.fsm.Event
+import experiments.experiment1.stack.fsm.State
 
 /**
  * Endliche Zustands Maschine. <p/>
@@ -102,7 +104,7 @@ class FiniteStateMachine {
         Map transition = transitions[a_event] as Map
 
         int nextState = 0
-        Utils.writeLog("FSM", "fire", "event: ${a_event} nextEvent: ${transition}", 2)
+        Utils.writeLog("FSM", "fire", "event: ${Event.s(a_event)} nextEvent: ${transition}", 2)
         /**Utils.writeLog("FSM", "fire", "curr_stat: ${currentState}", 2)
         Utils.writeLog("FSM", "fire", "next_stat_trans: ${transition[currentState]}", 2)
         Utils.writeLog("FSM", "fire", "states: ${transition}", 2)*/
@@ -113,7 +115,7 @@ class FiniteStateMachine {
         //assert nextState, "There is no transition from '${currentState}' to any other state"
         if (nextState)
             currentState = nextState
-        Utils.writeLog("FSM", "fire", "curr_stat: ${nextState}", 2)
+        Utils.writeLog("FSM", "fire", "curr_stat: ${State.s(nextState)}", 2)
         return nextState
     }
 

@@ -3,7 +3,7 @@ package experiments.experiment1.stack.fsm
 /**
  * Definition der möglichen Zustände der FSM.
  */
-class State {
+class State_old {
     /** Leerlauf */
     static final int S_IDLE = 100
 
@@ -49,9 +49,6 @@ class State {
     /** Daten werden gesendet */
     static final int S_SEND_DATA = 250
 
-    /** Verbindung schließen HACK */
-    static final int S_RCVD_CLS = 260
-
     static String s(int state) {
         switch (state) {
             case (S_IDLE) : return "S_IDLE"
@@ -69,7 +66,6 @@ class State {
             case (S_SEND_FIN_ACK) : return "S_SEND_FIN_ACK"
             case (S_WAIT_FIN_ACK_ACK) : return "S_WAIT_FIN_ACK_ACK"
             case (S_SEND_DATA) : return "S_SEND_DATA"
-            case (S_RCVD_CLS) : return "S_RCVD_CLS"
         }
         return "State unbekannt"
     }

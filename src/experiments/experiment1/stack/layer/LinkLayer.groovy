@@ -99,7 +99,7 @@ class LinkLayer {
             // Mac-Frame (L-PDU) entnehmen
             L_PDU macFrame = cl_idu.sdu as L_PDU
 
-            Utils.writeLog("LinkLayer", "receive", "uebernimmt von Anschluss ${cl_idu.lpName}: ${cl_idu}", 5)
+            Utils.writeLog("PhysLayer", "receive", "uebernimmt von Anschluss ${cl_idu.lpName}: ${cl_idu}", 5)
 
             // IP-PDU behandeln:
 
@@ -301,7 +301,7 @@ class LinkLayer {
             macFrame.sdu = il_idu.sdu // PDU entnehmen
             macFrame.type = ETHERTYPE_IP // Typfeld
 
-            Utils.writeLog("LinkLayer", "send", "uebergibt an Anschluss ${lpName}: ${lc_idu}", 5)
+            Utils.writeLog("PhysLayer", "send", "uebergibt an Anschluss ${lpName}: ${lc_idu}", 5)
 
             // Daten an Anschluss uebergeben
             connector.send(lc_idu)

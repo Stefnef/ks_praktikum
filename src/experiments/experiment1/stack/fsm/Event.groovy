@@ -38,13 +38,13 @@ class Event {
     static final int E_RCVD_ACK = 180
 
     /** ACK zur Verbindungseröffnung wurde gesendet */
-    static final int E_SYN_ACK_ACK_SENT = 190
+    static final int E_SENT_SYN_ACK_ACK = 190
 
     /** FIN+ACK+ACK wurde empfangen */
     static final int E_RCVD_FIN_ACK_ACK = 200
 
     /** FIN+ACK wurde empfangen */
-    static final int E_FIN_ACK_ACK_SENT = 210
+    static final int E_SEND_FIN_ACK_ACK = 210
 
     /** Bereitschaft */
     static final int E_READY = 220
@@ -57,6 +57,9 @@ class Event {
 
     /** FIN empfangen */
     static final int E_RCVD_FIN = 280
+
+    /** FIN ACK empfangen */
+    static final int E_RCVD_FIN_ACK = 290
 
     static String s(int event) {
         switch (event) {
@@ -71,12 +74,13 @@ class Event {
             case (E_RCVD_SYN_ACK_ACK) : return "E_RCVD_SYN_ACK_ACK"
             case (E_RCVD_DATA) : return "E_RCVD_DATA"
             case (E_RCVD_ACK ) : return "E_RCVD_ACK"
-            case (E_SYN_ACK_ACK_SENT) : return "E_SYN_ACK_ACK_SENT"
+            case (E_SENT_SYN_ACK_ACK) : return "E_SENT_SYN_ACK_ACK"
             case (E_RCVD_FIN_ACK_ACK) : return "E_RCVD_FIN_ACK_ACK"
-            case (E_FIN_ACK_ACK_SENT) : return "E_FIN_ACK_ACK_SENT"
+            case (E_SEND_FIN_ACK_ACK) : return "E_SEND_FIN_ACK_ACK"
             case (E_READY) : return "E_READY"
             case (E_DISCONN_REQ) : return "E_DISCONN_REQ"
             case (E_DATA_SENT) : return "E_DATA_SENT"
+            case (E_RCVD_FIN_ACK) : return "E_RCVD_FIN_ACK"
             case (E_RCVD_FIN): return "E_RCVD_FIN"
         }
         return "Event unbekannt"
