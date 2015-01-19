@@ -144,7 +144,6 @@ class TcpLayer {
             // Passiver Verbindungsaufbau SERVER
             [on: Event.E_RCVD_SYN, from: State.S_IDLE, to: State.S_SEND_SYN_ACK],                   //recieve()
                 [on: Event.E_SEND_SYN_ACK, from: State.S_SEND_SYN_ACK, to: State.S_WAIT_SYN_ACK_ACK],   //case (State.S_SEND_SYN_ACK)
-
             [on: Event.E_RCVD_SYN_ACK_ACK, from: State.S_WAIT_SYN_ACK_ACK, to: State.S_RCVD_ACK],      //recieve()
                 //[on: Event.E_READY, from: State.S_RCVD_ACK, to: State.S_READY],
 
@@ -262,14 +261,12 @@ class TcpLayer {
                 case (recvSynFlag):                          event = Event.E_RCVD_SYN      ;break */
 
                 // Verbindungsaufbau
-
                 case (recvAckFlag && fsm.currentState == State.S_WAIT_SYN_ACK_ACK): event = Event.E_RCVD_SYN_ACK_ACK ;break
                 case (recvSynFlag && recvAckFlag):           event = Event.E_RCVD_SYN_ACK  ;break
                 case (recvSynFlag):                          event = Event.E_RCVD_SYN      ;break
 
                 // Verbindungsabbau
                 case (recvAckFlag && fsm.currentState == State.S_WAIT_FIN_ACK_ACK): event = Event.E_RCVD_FIN_ACK_ACK ;break
-
                 case (recvFinFlag && recvAckFlag && fsm.currentState == State.S_READY): event = Event.E_RCVD_FIN      ;break
                 case (recvFinFlag && recvAckFlag):           event = Event.E_RCVD_FIN_ACK  ;break
 
@@ -418,7 +415,7 @@ class TcpLayer {
                 case (State.S_SEND_FIN):
                     Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)}", 2)
                     // Verbindungsabbau beginnen
-                    sendAckFlag = true
+                    /*sendAckFlag = true
                     sendSynFlag = false
                     sendFinFlag = true
                     sendRstFlag = false
@@ -426,7 +423,16 @@ class TcpLayer {
                     sendData = ""
 
                     //todo:seqNum hochzählen?
-                    //sendSeqNum += 1
+                    sendSeqNum += 1
+                    */
+
+                    sendSynFlag = false
+                    sendAckFlag = true
+                    sendAckNum = recvSeqNum + 1
+                    sendSeqNum += 1
+                    sendFinFlag = true
+                    sendRstFlag = false
+                    sendData = ""
 
                     // T-PDU erzeugen und senden
                     sendTpdu()
@@ -734,6 +740,7 @@ class TcpLayer {
             conn = [connId: connId, srcIpAddr: dstIpAddr, srcPort: dstPort]
             Utils.writeLog("TcpLayer", "listen", "Verbindung wurde geöffnet: ${conn}", 2)
         }
+        if (!conn) Utils.writeLog("TcpLayer", "listen", "conn NULL", 2)
         return conn
     }
 

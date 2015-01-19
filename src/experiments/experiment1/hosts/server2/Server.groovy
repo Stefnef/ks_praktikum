@@ -106,6 +106,10 @@ Das Objekt ${->name} wurde angefragt!
             // Auf das Öffnen einer TCP-Verbindung warten
             Map aidu = stack.tcpListen()
 
+            if (!aidu) {
+                Utils.writeLog("Server", "server", "ABBRUCH!!!: ${aidu}", 1)
+                return
+            }
             // Verbindungskennung merken
             connId = aidu.connId
 
@@ -116,9 +120,11 @@ Das Objekt ${->name} wurde angefragt!
                 Utils.writeLog("Server", "server", "empfängt tidu: ${tidu}", 1)
                 // Es wurden längere Zeit keine Daten empfangen oder die Datenlänge ist 0
                 // -> die TCP-Verbindung wird als geschlossen angenommen
-                if (!tidu.sdu)
-                // Nein, innere while-Schleife abbrechen
+                if (!tidu.sdu) {
+                    // Nein, innere while-Schleife abbrechen
+                    //stack.tcpClose(connId: connId)
                     break
+                }
 
                 // A-PDU uebernehmen
                 apdu = tidu.sdu
@@ -163,6 +169,7 @@ Das Objekt ${->name} wurde angefragt!
                     stack.tcpSend([connId: connId, sdu: reply])
                 }
             } // while
+
         } // while
     }
 }
