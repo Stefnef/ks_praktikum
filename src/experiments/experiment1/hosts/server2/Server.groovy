@@ -156,7 +156,8 @@ Das Objekt ${->name} wurde angefragt!
 
                         case "daten":
                             // hier langen HTTP-body erzeugen um lang anhaltende Übertragung zu erreichen
-                            data = "123"
+                            for (int i=1; i<=7500; i++)
+                            data += "#"
 
                             dataLength = data.size()
                             reply = reply1 + data // dabei wird dataLength in reply1 eingetragen

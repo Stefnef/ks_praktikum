@@ -52,6 +52,9 @@ class State {
     /** Verbindung schließen HACK */
     static final int S_RCVD_CLS = 260
 
+    /** verbindung öffnen Hack */
+    static final  int S_RCVD_OPN = 270
+
     static String s(int state) {
         switch (state) {
             case (S_IDLE) : return "S_IDLE"
@@ -70,6 +73,7 @@ class State {
             case (S_WAIT_FIN_ACK_ACK) : return "S_WAIT_FIN_ACK_ACK"
             case (S_SEND_DATA) : return "S_SEND_DATA"
             case (S_RCVD_CLS) : return "S_RCVD_CLS"
+            case (S_RCVD_OPN) : return "S_RCVD_OPN"
         }
         return "State unbekannt"
     }
