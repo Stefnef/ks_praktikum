@@ -137,37 +137,37 @@ class TcpLayer {
             [
                     // Aktiver Verbindungsaufbau CLIENT
                     [on: Event.E_CONN_REQ, from: State.S_IDLE, to: State.S_SEND_SYN],                       //send() OPEN
-                    [on: Event.E_SYN_SENT, from: State.S_SEND_SYN, to: State.S_WAIT_SYN_ACK],               //case (State.S_SEND_SYN)
+                        [on: Event.E_SYN_SENT, from: State.S_SEND_SYN, to: State.S_WAIT_SYN_ACK],               //case (State.S_SEND_SYN)
                     [on: Event.E_RCVD_SYN_ACK, from: State.S_WAIT_SYN_ACK, to: State.S_SEND_SYN_ACK_ACK],   //recieve()
-                    [on: Event.E_SYN_ACK_ACK_SENT, from: State.S_SEND_SYN_ACK_ACK, to: State.S_READY],      //case (State.S_SEND_SYN_ACK_ACK)
+                        [on: Event.E_SYN_ACK_ACK_SENT, from: State.S_SEND_SYN_ACK_ACK, to: State.S_READY],      //case (State.S_SEND_SYN_ACK_ACK)
 
                     // Passiver Verbindungsaufbau SERVER
                     [on: Event.E_RCVD_SYN, from: State.S_IDLE, to: State.S_SEND_SYN_ACK],                   //recieve()
-                    [on: Event.E_SYN_ACK_SENT, from: State.S_SEND_SYN_ACK, to: State.S_WAIT_SYN_ACK_ACK],   //case (State.S_SEND_SYN_ACK)
+                        [on: Event.E_SYN_ACK_SENT, from: State.S_SEND_SYN_ACK, to: State.S_WAIT_SYN_ACK_ACK],   //case (State.S_SEND_SYN_ACK)
                     [on: Event.E_RCVD_SYN_ACK_ACK, from: State.S_WAIT_SYN_ACK_ACK, to: State.S_RCVD_OPN],      //recieve()
-                    [on: Event.E_READY, from: State.S_RCVD_OPN, to: State.S_READY],
+                        [on: Event.E_READY, from: State.S_RCVD_OPN, to: State.S_READY],
 
                     // Datenübertragung: Senden
                     [on: Event.E_SEND_DATA, from: State.S_READY, to: State.S_SEND_DATA],                    //send() DATA
-                    [on: Event.E_DATA_SENT, from: State.S_SEND_DATA, to: State.S_READY],                    //case (State.S_SEND_DATA)
+                        [on: Event.E_DATA_SENT, from: State.S_SEND_DATA, to: State.S_READY],                    //case (State.S_SEND_DATA)
                     [on: Event.E_RCVD_ACK, from: State.S_READY, to: State.S_RCVD_ACK],                      //recieve() !DATA
-                    [on: Event.E_READY, from: State.S_RCVD_ACK, to: State.S_READY],                         //case (State.S_RCVD_ACK)
+                        [on: Event.E_READY, from: State.S_RCVD_ACK, to: State.S_READY],                         //case (State.S_RCVD_ACK)
 
                     // Datenübertragung: Empfangen
                     [on: Event.E_RCVD_DATA, from: State.S_READY, to: State.S_RCVD_DATA],                    //recieve()
-                    [on: Event.E_READY, from: State.S_RCVD_DATA, to: State.S_READY],                        //case (State.S_RCVD_DATA)
+                        [on: Event.E_READY, from: State.S_RCVD_DATA, to: State.S_READY],                        //case (State.S_RCVD_DATA)
 
                     // Aktiver Verbindungsabbau CLIENT oder SERVER
                     [on: Event.E_DISCONN_REQ, from: State.S_READY, to: State.S_SEND_FIN],                   //send() CLOSE
-                    [on: Event.E_FIN_SENT, from: State.S_SEND_FIN, to: State.S_WAIT_FIN_ACK],               //case (State.S_SEND_FIN)
+                        [on: Event.E_FIN_SENT, from: State.S_SEND_FIN, to: State.S_WAIT_FIN_ACK],               //case (State.S_SEND_FIN)
                     [on: Event.E_RCVD_FIN_ACK, from: State.S_WAIT_FIN_ACK, to: State.S_SEND_FIN_ACK_ACK],   //recieve()
-                    [on: Event.E_FIN_ACK_ACK_SENT, from: State.S_SEND_FIN_ACK_ACK, to: State.S_IDLE],       //case (State.S_SEND_FIN_ACK_ACK)
+                        [on: Event.E_FIN_ACK_ACK_SENT, from: State.S_SEND_FIN_ACK_ACK, to: State.S_IDLE],       //case (State.S_SEND_FIN_ACK_ACK)
 
                     // Passiver Verbindungsabbau CLIENT oder SERVER
                     [on: Event.E_RCVD_FIN, from: State.S_READY, to: State.S_SEND_FIN_ACK],                  //recieve()
-                    [on: Event.E_FIN_ACK_SENT, from: State.S_SEND_FIN_ACK, to: State.S_WAIT_FIN_ACK_ACK],   //case (State.S_SEND_FIN_ACK)
+                        [on: Event.E_FIN_ACK_SENT, from: State.S_SEND_FIN_ACK, to: State.S_WAIT_FIN_ACK_ACK],   //case (State.S_SEND_FIN_ACK)
                     [on: Event.E_RCVD_FIN_ACK_ACK, from: State.S_WAIT_FIN_ACK_ACK, to: State.S_RCVD_CLS],       //recieve()
-                    [on: Event.E_READY, from: State.S_RCVD_CLS, to: State.S_IDLE]
+                        [on: Event.E_READY, from: State.S_RCVD_CLS, to: State.S_IDLE]
 
             ]
 
