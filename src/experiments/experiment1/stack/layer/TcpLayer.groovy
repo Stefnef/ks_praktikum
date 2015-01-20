@@ -321,10 +321,36 @@ class TcpLayer {
                 case DATA:
                     // Daten senden
                     sendData = at_idu.sdu // Anwendungsdaten übernehmen
-                    handleStateChange(Event.E_SEND_DATA)
+                    List<String> segements = createSegments(sendData)
+                    for(String segment : segements) {
+                        sendData = segment
+                        handleStateChange(Event.E_SEND_DATA)
+                    }
                     break
             }
         }
+    }
+
+    List<String> createSegments(String data){
+        List<String> segments = []
+        int headerSize = 20
+        int segDataSize = MSS-headerSize
+        if(data.bytes.size() < segDataSize){
+            segments.add(data)
+            return segments
+        }
+        else{
+            String remainingData = data
+            while(remainingData.bytes.size() > segDataSize){
+                String segData = ""
+                for(Byte b : remainingData.bytes[0..segDataSize])
+                    segData += (b as char)
+                remainingData = remainingData.replace(segData, "")
+                segments.add(segData)
+            }
+        }
+        Utils.writeLog("TcpLayer", "send", "Segmentierung der Daten: ${segments}", 2)
+        return segments
     }
 
     //------------------------------------------------------------------------------
