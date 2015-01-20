@@ -55,8 +55,8 @@ environments {
             serverName = "webserver.local"
 
             // Durch HTTP-GET-Request zu ladenden Dokument
-            document = "index.html"
-            //document = "daten"
+            //document = "index.html"
+            document = "daten"
 
             // TCP- und UDP-Portnummer der Serveranwendung
             serverPort = 80
