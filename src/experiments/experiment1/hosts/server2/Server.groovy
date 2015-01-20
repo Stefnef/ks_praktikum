@@ -163,7 +163,7 @@ Das Objekt ${->name} wurde angefragt!
                             break
                     }
 
-                    Utils.writeLog("Server", "server", "sendet: ${new String(apdu)}", 11)
+                    Utils.writeLog("Server", "server", "sendet: ${new String(apdu)}", 1)
 
                     // Antwort senden
                     stack.tcpSend([connId: connId, sdu: reply])

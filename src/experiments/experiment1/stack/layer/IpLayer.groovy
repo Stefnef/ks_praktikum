@@ -94,7 +94,7 @@ class IpLayer {
             // IP-PDU entnehmen
             i_pdu = li_idu.sdu as I_PDU
 
-            Utils.writeLog("IpLayer", "receive", "uebernimmt von Link: ${li_idu}", 4)
+            Utils.writeLog("IpLayer", "receive", "uebernimmt von Link: ${li_idu}", 6)
 
             // Ist das Paket an eine der eigenen IP-Adressen adressiert
             // Auf IP-Broadcast wird hier nicht getestet
@@ -142,14 +142,14 @@ class IpLayer {
                         // Nein
                         il_idu.nextHopAddr = nextHopAddr
 
-                    Utils.writeLog("IpLayer", "receive", "forwarding: ${li_idu}", 4)
+                    Utils.writeLog("IpLayer", "receive", "forwarding: ${li_idu}", 6)
 
                     // Daten an Link-Schicht uebergeben
                     toLinkQ.put(il_idu)
                 }
                 else {
                     // Nein
-                    Utils.writeLog("IpLayer", "receive", "keine Route gefunden fuer: ${linkPortName}, ${i_pdu.dstIpAddr}", 4)
+                    Utils.writeLog("IpLayer", "receive", "keine Route gefunden fuer: ${linkPortName}, ${i_pdu.dstIpAddr}", 6)
                 }
             }
         }
@@ -183,12 +183,12 @@ class IpLayer {
             // blockierendes Lesen von TCP oder UDP
             ti_idu = fromTcpUdpQ.take()
 
-            Utils.writeLog("IpLayer", "send", "uebernimmt von TCP/UDP: ${ti_idu}", 4)
+            Utils.writeLog("IpLayer", "send", "uebernimmt von TCP/UDP: ${ti_idu}", 6)
 
             linkPortName = "lp1"
             nextHopAddr = ownIpAddrs[linkPortName]
 
-            Utils.writeLog("IpLayer", "send", "|###|: ${routingTable}", 4)
+            Utils.writeLog("IpLayer", "send", "|###|: ${routingTable}", 6)
 
             // Nächstes Gerät (next hop) auf dem Pfad zum Zielgerät suchen
             (linkPortName, nextHopAddr) = findNextHop(ti_idu.dstIpAddr)
@@ -234,7 +234,7 @@ class IpLayer {
                 toLinkQ.put(il_idu)
             } else {
                 // Nein
-                Utils.writeLog("IpLayer", "send", "keine Route gefunden fuer: ${linkPortName}, $nextHopAddr # ${ti_idu.dstIpAddr}", 4)
+                Utils.writeLog("IpLayer", "send", "keine Route gefunden fuer: ${linkPortName}, $nextHopAddr # ${ti_idu.dstIpAddr}", 6)
             }
         }
     }

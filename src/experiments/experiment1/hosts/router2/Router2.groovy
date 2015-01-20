@@ -100,7 +100,7 @@ class Router2 {
         (iPAddr, port, rInfo) = stack.udpReceive()
 
 
-        Utils.writeLog("Router2", "router2", "empfängt von $iPAddr:$port: $rInfo ", 3)
+        Utils.writeLog("Router2", "router2", "empfängt von $iPAddr:$port: $rInfo ", 1)
         // Jetzt aktuelle Routingtablle holen:
         // rt = stack.getRoutingtable()
         // neue Routinginformationen bestimmen
@@ -121,7 +121,7 @@ class Router2 {
         // Paket mit Routinginformationen packen
         // ... z.B.
         routingTable = stack.getRoutingTable()
-        Utils.writeLog("Router", "router2", " hat Routing TABELLE $routingTable", 3)
+        Utils.writeLog("Router", "router2", " hat Routing TABELLE $routingTable", 1)
 
         for (List route in routingTable) {
             //Utils.writeLog("Router1", "router1", " Routing-Eintrag: ${route[0]} - ${route[1]} - ${route[2]} - ${route[3]}", 3)

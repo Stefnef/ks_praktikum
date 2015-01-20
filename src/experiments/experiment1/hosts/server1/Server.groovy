@@ -149,7 +149,7 @@ Das Objekt ${->name} wurde angefragt!
                         reply = reply1 + data // dabei wird dataLength in reply1 eingetragen
                         break
                 }
-                Utils.writeLog("Server", "server", "sendet: $reply", 11)
+                Utils.writeLog("Server", "server", "sendet: $reply", 1)
 
                 // Antwort senden
                 stack.udpSend(dstIpAddr: srcIpAddr, dstPort: srcPort,
