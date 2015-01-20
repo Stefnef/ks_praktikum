@@ -159,6 +159,8 @@ Host: www.domain.com
             data = ""
             state = WAIT_LENGTH
 
+            for (int i=1; i<=3000; i++)
+                request += "+"
             // Senden der Anwendungs-Protokolldaten (HTTP-Request)
             stack.tcpSend(connId: connId, sdu: request)
 
