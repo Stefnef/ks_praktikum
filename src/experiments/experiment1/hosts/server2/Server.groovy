@@ -157,15 +157,13 @@ Das Objekt ${->name} wurde angefragt!
                         case "daten":
                             // hier langen HTTP-body erzeugen um lang anhaltende Übertragung zu erreichen
                             data = ""
-                            for (int i=1; i<=7500; i++)
-                                data += "#"
+                            for (int i=1; i<=1000; i++)
+                                data += "#${i}"
 
                             dataLength = data.size()
                             reply = reply1 + data // dabei wird dataLength in reply1 eingetragen
                             break
                     }
-
-                    Utils.writeLog("Server", "server", "sendet DATEN: ${new String(apdu)}", 1)
 
                     // Antwort senden
                     stack.tcpSend([connId: connId, sdu: reply])

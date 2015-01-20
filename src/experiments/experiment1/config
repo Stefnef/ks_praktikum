@@ -21,8 +21,8 @@ environment = "LOCAL"
 ////////////////////////////////////////
 
 
-
-debugLevel = [7,8,6,5,4,1,2]
+debugLevel = [22]
+//debugLevel = [7,8,6,5,4,1,2,22]
 
 // Verzögerung in Millisekunden bei der Ausgabe von Utils.writelog (zum Mitlesen auf dem Terminal)
 debugDelay = 0
@@ -55,8 +55,8 @@ environments {
             serverName = "webserver.local"
 
             // Durch HTTP-GET-Request zu ladenden Dokument
-            document = "index.html"
-            //document = "daten"
+            //document = "index.html"
+            document = "daten"
 
             // TCP- und UDP-Portnummer der Serveranwendung
             serverPort = 80

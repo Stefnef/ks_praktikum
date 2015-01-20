@@ -40,7 +40,7 @@ class TcpLayer {
     static final int WINDOWSIZE = 1000
 
     /** Maximale TCP-Segmentgrösse */
-    static final int MSS = 100
+    static final int MSS = 120
 
     //------------------------------------------------------------------------------
 
@@ -252,6 +252,7 @@ class TcpLayer {
             int event = 0
             // Ereignis bestimmen
             Utils.writeLog("TcpLayer", "receive", "state: ${State.s(fsm.currentState)} ist aktuell.", 2)
+            Utils.writeLog("TcpLayer", " <--", "PACKET:  ${it_idu}", 22)
             switch(true) {
             /* case (recvSynFlag && recvAckFlag):           event = Event.E_RCVD_SYN_ACK  ;break
              case (recvAckFlag && newState == State.S_WAIT_SYN_ACK_ACK): event = Event.E_RCVD_SYN_ACK_ACK ;break
@@ -270,8 +271,8 @@ class TcpLayer {
                 case (recvFinFlag && recvAckFlag && fsm.currentState == State.S_READY):             event = Event.E_RCVD_FIN            ;break
                 case (recvFinFlag && recvAckFlag):                                                  event = Event.E_RCVD_FIN_ACK        ;break
 
-            //kein Verbindungsauf- oder abbau
-                case (recvAckFlag && t_pdu.sdu.size() == 0): event = Event.E_RCVD_ACK      ;break
+            // Datenaustausch
+                case (recvAckFlag && t_pdu.sdu.size() == 0): event = Event.E_RCVD_ACK ;break
                 case (recvAckFlag && t_pdu.sdu.size() > 0):  event = Event.E_RCVD_DATA     ;break
 
 
@@ -321,11 +322,11 @@ class TcpLayer {
                 case DATA:
                     // Daten senden
                     sendData = at_idu.sdu // Anwendungsdaten übernehmen
-                    List<String> segements = createSegments(sendData)
-                    for(String segment : segements) {
-                        sendData = segment
+                    //List<String> segements = createSegments(sendData)
+                    //for(String segment : segements) {
+                        //sendData = segment
                         handleStateChange(Event.E_SEND_DATA)
-                    }
+                    //}
                     break
             }
         }
@@ -337,15 +338,16 @@ class TcpLayer {
         int segDataSize = MSS-headerSize
         if(data.bytes.size() < segDataSize){
             segments.add(data)
-            return segments
-        }
-        else{
+        } else {
             String remainingData = data
+            String segData
             while(remainingData.bytes.size() > segDataSize){
-                String segData = ""
-                for(Byte b : remainingData.bytes[0..segDataSize])
-                    segData += (b as char)
-                remainingData = remainingData.replace(segData, "")
+                segData = ""
+                segData = remainingData[0..segDataSize-1]
+                //for(Byte b : remainingData.bytes[0..segDataSize-1])
+                  //  segData += (b as char)
+
+                remainingData = remainingData[segDataSize..remainingData.length()-1]
                 segments.add(segData)
             }
         }
@@ -448,19 +450,33 @@ class TcpLayer {
             // Daten senden
 
                 case (State.S_SEND_DATA):
+                    //todo: Segmete aufbauen
                     Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)} sendet Daten Groesse: ${sendData.bytes.size()}", 2)
                     // Senden von Anwendungsdaten
                     sendSynFlag = false
                     sendAckFlag = true
                     sendFinFlag = false
 
-                    // Daten senden
-                    sendTpdu()
+                    Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)} SENDE: $sendData", 22)
+
+                    if (sendData.length() > MSS) {
+
+                        def tmp = sendData
+                        // Date kürzen
+                        sendData = sendData[0..MSS-1] //todo: richtige MSS Größe
+
+                        // Daten senden
+                        sendTpdu()
+                        //sendData konsumieren
+                        sendData = tmp[MSS + 1..tmp.length() - 1]
+                    } else {
+                        // Daten gleich senden
+                        sendTpdu()
+                    }
 
                     // Bei UTF-8 Encoding besser: sendSeqNum += sendData.bytes.size()
                     // die erwartete seqNum berechnen
                     sendSeqNum += sendData.bytes.size()
-                    Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)} SENDE: $sendData", 2)
                     // Neuen Zustand der FSM erzeugen
                     fsm.fire(Event.E_DATA_SENT)
                     break
@@ -474,7 +490,8 @@ class TcpLayer {
                     // Wurde die Sequenznummer erwartet?
                     // ACHTUNG: hier wird momentan Auslieferungsdisziplin der IP-Schicht angenommen!
                     //Utils.writeLog("TcpLayer", "handleStateChange", "recvSeqNum: ${recvSeqNum} sendAckNum: ${sendAckNum} ", 2)
-                    if (recvSeqNum == sendAckNum) {
+
+                    if ( sendAckNum == recvSeqNum ) {
                         // Ja, ACK senden
                         sendSynFlag = false
                         sendAckFlag = true
@@ -490,8 +507,8 @@ class TcpLayer {
 
                         // Daten uebernehmen
                         ta_idu.sdu = recvData
-                        Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)} EMPFANGE: ${recvData}  Groesse: ${sendData.bytes.size()}", 2)
-                        Utils.writeLog("TcpLayer", "handleStateChange", "receiveData an APP: ${ta_idu}", 2)
+                        Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)} Groesse: ${sendData.bytes.size()} EMPFANGEN: ${recvData}  ", 2)
+                        Utils.writeLog("TcpLayer", "handleStateChange", "gebe Daten an App: ${ta_idu}", 22)
                         // IDU an Anwendung übergeben
                         toAppQ.put(ta_idu)
 
@@ -499,6 +516,10 @@ class TcpLayer {
 
                         // ACK senden
                         sendTpdu()
+                    } else if (sendAckNum < recvSeqNum) {
+                        Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)} DATEN FEHLEN", 22)
+                    } else {
+                        Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)} DATEN DOPPEL", 22)
                     }
 
                     // Neuen Zustand der FSM erzeugen
@@ -509,20 +530,21 @@ class TcpLayer {
             // ACK empfangen
 
                 case (State.S_RCVD_ACK):
-                    Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)}  Groesse: ${recvData.bytes.size()}", 2)
+                    Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)}  Groesse: ${recvData.bytes.size()}", 22)
                     // ACK ohne Daten empfangen ???
+                    //Utils.writeLog("TcpLayer", "<--", "PACKET: ${it_idu}", 22)
                     if (recvData.bytes.size()) {
 
-
+                        sendSeqNum = recvAckNum
+                        sendAckNum = recvSeqNum + recvData.bytes.size()
 
                     } else {
-
+                        //todo: State.S_RCVD_ACK !!!
+                        //weitere Daten senden, wenn verfügbar
+                        //sendTpdu()
 
                     }
 
-                    sendSeqNum = recvAckNum
-                    sendAckNum = recvSeqNum + recvData.bytes.size()
-                    //sendTpdu()
                     fsm.fire(Event.E_READY)
                     break
 
@@ -645,8 +667,9 @@ class TcpLayer {
         ti_idu.protocol = IpLayer.PROTO_TCP
 
         // IDU in Warteschlange fuer Sendewiederholungen eintragen
-        // insertWaitQ(ti_idu)
+        //insertWaitQ(ti_idu)
 
+        Utils.writeLog("TcpLayer", "-->", "PACKET: ${ti_idu}", 22)
         // Daten an IP-Schicht uebergeben
         toIpQ.put(ti_idu)
     }
