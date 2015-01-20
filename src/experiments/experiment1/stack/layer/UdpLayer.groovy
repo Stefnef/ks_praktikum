@@ -85,7 +85,7 @@ class UdpLayer {
             // UDP-PDU entnehmen
             u_pdu = iu_idu.sdu as U_PDU
 
-            Utils.writeLog("UdpLayer", "receive", "uebernimmt von IP: ${iu_idu}", 3)
+            Utils.writeLog("UdpLayer", "receive", "uebernimmt von IP: ${iu_idu}", 4)
 
             // auf richtigen Zielport testen
             if (ownPort == u_pdu.dstPort) {
@@ -100,7 +100,7 @@ class UdpLayer {
 
             } else {
                 //Utils.writeLog("UdpLayer", "receive", "ownPort: ${ownPort} destPort: ${u_pdu.dstPort}", 3)
-                Utils.writeLog("UdpLayer", "receive", "Ignoring coming UDP-Data for ${u_pdu.dstPort} - my port is ${ownPort}", 3)
+                Utils.writeLog("UdpLayer", "receive", "Ignoring coming UDP-Data for ${u_pdu.dstPort} - my port is ${ownPort}", 4)
             }
         }
     }
@@ -129,7 +129,7 @@ class UdpLayer {
             // blockierendes Lesen von Anwendung
             au_idu = fromAppQ.take()
 
-            Utils.writeLog("UdpLayer", "send", "uebernimmt  von Anwendung: ${au_idu}", 3)
+            Utils.writeLog("UdpLayer", "send", "uebernimmt  von Anwendung: ${au_idu}", 4)
 
             // UDP-PDU erzeugen
             u_pdu = new U_PDU()
@@ -161,7 +161,7 @@ class UdpLayer {
      */
     List receiving() {
 
-        Utils.writeLog("UdpLayer", "receiving", "warte auf Empfang an Port: ${ownPort}", 3)
+        Utils.writeLog("UdpLayer", "receiving", "warte auf Empfang an Port: ${ownPort}", 4)
 
         // Warten auf Empfang
         UA_IDU ua_idu = toAppQ.take()

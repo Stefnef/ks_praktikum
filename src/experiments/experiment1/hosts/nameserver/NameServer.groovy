@@ -88,7 +88,7 @@ class NameServer {
             // Abbruch wenn Länge der empfangenen Daten == 0
             if (!data)
                 break
-            Utils.writeLog("NameServer", "nameserver", "empfängt von $srcIpAddr:$srcPort: $data ", 3)
+            Utils.writeLog("NameServer", "nameserver", "empfängt von $srcIpAddr:$srcPort: $data ", 1)
             //matcher = (data =~ /(.*?)\s*/)
             //Utils.writeLog("NameServer", "nameserver", "empfängt: $matcher", 1)
 
@@ -97,7 +97,7 @@ class NameServer {
 
             reply = nameTable[data]
 
-            Utils.writeLog("NameServer", "nameserver", "sendet: $reply", 3)
+            Utils.writeLog("NameServer", "nameserver", "sendet: $reply", 1)
 
             // Antwort senden
             stack.udpSend(dstIpAddr: srcIpAddr, dstPort: srcPort, srcPort: ownPort, sdu: reply)

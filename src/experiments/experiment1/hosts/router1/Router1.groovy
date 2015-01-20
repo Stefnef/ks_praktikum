@@ -110,7 +110,7 @@ class Router1 {
         // Auf UDP-Empfang warten
         (iPAddr, port, rInfo) = stack.udpReceive()
 
-        Utils.writeLog("Router", "router1", "empfängt von $iPAddr:$port: $rInfo ", 3)
+        Utils.writeLog("Router", "router1", "empfängt von $iPAddr:$port: $rInfo ", 1)
 
         //Jetzt aktuelle Routingtablle holen:
         //rt = stack.getRoutingtable()
@@ -147,7 +147,7 @@ class Router1 {
         // Paket mit Routinginformationen packen
         // ... z.B.
         routingTable = stack.getRoutingTable()
-        Utils.writeLog("Router", "router1", " hat Routing TABELLE $routingTable", 3)
+        Utils.writeLog("Router", "router1", " hat Routing TABELLE $routingTable", 1)
 
         rInfo = ""
         for (List route in routingTable) {
@@ -159,7 +159,7 @@ class Router1 {
             //ja ist Backbone, nicht propagieren
             //nein, kein Backbone - Route senden (und damit nur Netz1 und Netz2 propagieren aber kein Backbone)
             if (!neigbr) {
-                Utils.writeLog("Router1", "router1", " Propagiere Route: ${route}", 3)
+                Utils.writeLog("Router1", "router1", " Propagiere Route: ${route}", 2)
                 //senden, Router ist nextHop für dieses jeweilige Netz
                 //192.168.1.0/24 10.10.1.1 lp2
                 //192.168.1.0/24 10.10.4.2 lp5
@@ -191,7 +191,7 @@ class Router1 {
     void sendToNeigbors(String rInfo) {
         // rInfo an alle Nachbarrouter versenden
         for (List neigbor in neighborTable) {
-            Utils.writeLog("Router", "router1", "sende an Nachbar: ${neigbor[0]} Info: $rInfo", 3)
+            Utils.writeLog("Router", "router1", "sende an Nachbar: ${neigbor[0]} Info: $rInfo", 2)
             stack.udpSend(dstIpAddr: neigbor[0], dstPort: neigbor[1], srcPort: config.ownPort, sdu: rInfo)
         }
     }

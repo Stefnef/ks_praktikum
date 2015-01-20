@@ -447,7 +447,7 @@ class TcpLayer {
                     // Daten empfangen
                     // Wurde die Sequenznummer erwartet?
                     // ACHTUNG: hier wird momentan Auslieferungsdisziplin der IP-Schicht angenommen!
-                    //Utils.writeLog("TcpLayer", "handleStateChange", "recvSeqNum: ${recvSeqNum} sendAckNum: ${sendAckNum} ", 2)
+                    Utils.writeLog("TcpLayer", "handleStateChange", "recvSeqNum: ${recvSeqNum} sendAckNum: ${sendAckNum} ", 2)
                     if (recvSeqNum == sendAckNum) {
                         // Ja, ACK senden
                         sendSynFlag = false
@@ -457,7 +457,6 @@ class TcpLayer {
                         sendFinFlag = false
                         sendRstFlag = false
                         sendData = ""
-                        sendSeqNum = recvAckNum
 
                         TA_IDU ta_idu = new TA_IDU()
                         ta_idu.connId = connId
@@ -529,6 +528,9 @@ class TcpLayer {
                     // T-PDU erzeugen und senden
                     sendTpdu()
 
+                    // Bei UTF-8 Encoding besser: sendSeqNum += sendData.bytes.size()
+                    sendSeqNum += sendData.bytes.size()
+                    Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)} SENDE: $sendData", 2)
                     // Neuen Zustand der FSM erzeugen
                     fsm.fire(Event.E_FIN_SENT)
                     break
@@ -580,7 +582,6 @@ class TcpLayer {
                     // Neuen Zustand der FSM erzeugen
                     fsm.fire(Event.E_READY)
 
-                    notifyClose()
                     break
 
             // ----------------------------------------------------------
