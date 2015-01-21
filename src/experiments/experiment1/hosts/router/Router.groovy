@@ -104,7 +104,7 @@ class Router {
             // Auf UDP-Empfang warten
             (iPAddr, port, rInfo) = stack.udpReceive()
 
-            Utils.writeLog("Router", routerNr, "empfängt von $iPAddr:$port: $rInfo ", 1)
+            Utils.writeLog("Router", routerNr, "empfängt von $iPAddr:$port: $rInfo ", 2)
 
             // Nachbar Counter zurücksetzen
             for ( List nt in neighborTable){

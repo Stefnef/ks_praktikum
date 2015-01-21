@@ -218,7 +218,7 @@ class TcpLayer {
             t_pdu = it_idu.sdu as T_PDU
             dstIpAddr = it_idu.srcIpAddr
 
-            Utils.writeLog("TcpLayer", "receive", "uebernimmt  von IP: ${it_idu}", 2)
+            Utils.writeLog("TcpLayer", "receive", "uebernimmt  von IP: ${it_idu}", 7)
 
             // Hier z.B. noch auf richtigen Zielport testen
             if (ownPort != t_pdu.dstPort) {
@@ -252,8 +252,8 @@ class TcpLayer {
 
             int event = 0
             // Ereignis bestimmen
-            Utils.writeLog("TcpLayer", "receive", "state: ${State.s(fsm.currentState)} ist aktuell.", 2)
-            Utils.writeLog("TcpLayer", " <--", "PACKET:  ${it_idu}", 22)
+            Utils.writeLog("TcpLayer", "receive", "state: ${State.s(fsm.currentState)} ist aktuell.", 7)
+            Utils.writeLog("TcpLayer", " <--", "PACKET:  ${it_idu}", 88)
             switch(true) {
             /* case (recvSynFlag && recvAckFlag):           event = Event.E_RCVD_SYN_ACK  ;break
              case (recvAckFlag && newState == State.S_WAIT_SYN_ACK_ACK): event = Event.E_RCVD_SYN_ACK_ACK ;break
@@ -278,7 +278,7 @@ class TcpLayer {
 
 
             }
-            Utils.writeLog("TcpLayer", "receive", "event: ${Event.s(event)} gefunden. Gehe in handleState", 2)
+            Utils.writeLog("TcpLayer", "receive", "event: ${Event.s(event)} gefunden. Gehe in handleState", 7)
             if (event) {
                 // Neuen Zustand behandeln
                 handleStateChange(event)
@@ -302,7 +302,7 @@ class TcpLayer {
         while (run) {
             at_idu = fromAppQ.take() // blockierendes Lesen von Anwendung
 
-            Utils.writeLog("TcpLayer", "send", "uebernimmt  von Anwendung: ${at_idu}", 2)
+            Utils.writeLog("TcpLayer", "send", "uebernimmt  von Anwendung: ${at_idu}", 7)
 
             switch (at_idu.command) {
                 case OPEN:
@@ -368,18 +368,18 @@ class TcpLayer {
         //int newState = fsm.fire(event)
         fsm.fire(event) // von send() und recieve()
         int currState = fsm.getState()
-        //Utils.writeLog("TcpLayer", "handleStateChange", "newState vor switch: ${newState}", 2)
+        //Utils.writeLog("TcpLayer", "handleStateChange", "newState vor switch: ${newState}", 8)
         if (currState) {
             // Neuen Zustand behandeln
 
-            Utils.writeLog("TcpLayer", "handleStateChange", "newState: ${State.s(currState)}", 2)
+            Utils.writeLog("TcpLayer", "handleStateChange", "newState: ${State.s(currState)}", 8)
             switch (currState) {
 
             // ----------------------------------------------------------
             // Aktiver Verbindungsaufbau
 
                 case (State.S_SEND_SYN):
-                    Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)}", 2)
+                    Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)}", 8)
                     // Verbindungsaufbau beginnen
                     sendAckNum = 0
                     sendSeqNum = 101//new Random().nextInt(6000) + 1
@@ -399,7 +399,7 @@ class TcpLayer {
                     break
 
                 case (State.S_SEND_SYN_ACK_ACK):
-                    Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)}", 2)
+                    Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)}", 8)
                     // SYN+ACK empfangen, ACK senden
                     sendSynFlag = false
                     sendAckFlag = true
@@ -423,7 +423,7 @@ class TcpLayer {
             // Passiver Verbindungsaufbau
 
                 case (State.S_SEND_SYN_ACK):
-                    Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)}", 2)
+                    Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)}", 8)
                     // SYN empfangen und senden ACK und SYN
                     sendSynFlag = true
                     sendAckFlag = true
@@ -440,7 +440,7 @@ class TcpLayer {
                     break
 
                 case (State.S_RCVD_OPN):
-                    Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)}", 2)
+                    Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)}", 8)
 
                     // Neuen Zustand der FSM erzeugen
                     fsm.fire(Event.E_READY)
@@ -453,13 +453,13 @@ class TcpLayer {
 
                 case (State.S_SEND_DATA):
                     //todo: Segmete aufbauen
-                    Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)} sendet Daten Groesse: ${sendData.bytes.size()}", 2)
+                    Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)} sendet Daten Groesse: ${sendData.bytes.size()}", 8)
                     // Senden von Anwendungsdaten
                     sendSynFlag = false
                     sendAckFlag = true
                     sendFinFlag = false
 
-                    Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)} bereite Daten zum Senden vor: $sendData", 2)
+                    Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)} bereite Daten zum Senden vor: $sendData", 8)
 
                   /*  if (sendData.length() > MSS) {
 
@@ -487,11 +487,11 @@ class TcpLayer {
             // Daten empfangen
 
                 case (State.S_RCVD_DATA):
-                    Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)}", 2)
+                    Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)}", 8)
                     // Daten empfangen
                     // Wurde die Sequenznummer erwartet?
                     // ACHTUNG: hier wird momentan Auslieferungsdisziplin der IP-Schicht angenommen!
-                    //Utils.writeLog("TcpLayer", "handleStateChange", "recvSeqNum: ${recvSeqNum} sendAckNum: ${sendAckNum} ", 2)
+                    //Utils.writeLog("TcpLayer", "handleStateChange", "recvSeqNum: ${recvSeqNum} sendAckNum: ${sendAckNum} ", 7)
 
                     if ( sendAckNum == recvSeqNum ) {
                         // Ja, ACK senden
@@ -509,8 +509,8 @@ class TcpLayer {
 
                         // Daten uebernehmen
                         ta_idu.sdu = recvData
-                        Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)} GRO?E: ${recvData.bytes.size()} EMPFANGEN: ${recvData}  ", 2)
-                        Utils.writeLog("TcpLayer", "handleStateChange", "gebe Daten an App: ${ta_idu}", 2)
+                        Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)} GRO?E: ${recvData.bytes.size()} EMPFANGEN: ${recvData}  ", 8)
+                        Utils.writeLog("TcpLayer", "handleStateChange", "gebe Daten an App: ${ta_idu}", 8)
                         // IDU an Anwendung übergeben
                         toAppQ.put(ta_idu)
 
@@ -519,9 +519,9 @@ class TcpLayer {
                         // ACK senden
                         sendTpdu()
                     } else if (sendAckNum < recvSeqNum) {
-                        Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)} DATEN FEHLEN", 22)
+                        Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)} DATEN FEHLEN", 88)
                     } else {
-                        Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)} DATEN DOPPEL", 22)
+                        Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)} DATEN DOPPEL", 88)
                     }
 
                     // Neuen Zustand der FSM erzeugen
@@ -532,13 +532,15 @@ class TcpLayer {
             // ACK empfangen
 
                 case (State.S_RCVD_ACK):
-                    Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)}  ",2)
+                    Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)}  ",8)
                     // ACK ohne Daten empfangen ???
                     //Utils.writeLog("TcpLayer", "<--", "PACKET: ${it_idu}", 22)
 
                     if(sendData){
+                        // es sind noch Daten zu senden
                         sendSeqNum = recvAckNum
                         sendSegment()
+
                     }
 
                     if (recvData.bytes.size()) {
@@ -546,11 +548,6 @@ class TcpLayer {
                         sendSeqNum = recvAckNum
                         sendAckNum = recvSeqNum + recvData.bytes.size()
 
-                    } else {
-                        //todo: State.S_RCVD_ACK !!!
-                        //ACKs ohne Daten werden nicht geACKt!
-                        //sendTpdu()
-                        //todo:Ack bestätigen
                     }
 
                     fsm.fire(Event.E_READY)
@@ -561,18 +558,8 @@ class TcpLayer {
             // ----------------------------------------------------------
             // Aktiver Verbindungsabbau
                 case (State.S_SEND_FIN):
-                    Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)}", 2)
+                    Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)}", 8)
                     // Verbindungsabbau beginnen
-                    /*sendAckFlag = true
-                    sendSynFlag = false
-                    sendFinFlag = true
-                    sendRstFlag = false
-                    sendWindSize = 0
-                    sendData = ""
-
-                    //todo:seqNum hochzählen?
-                    sendSeqNum += 1
-                    */
 
                     sendSynFlag = false
                     sendAckFlag = true
@@ -590,7 +577,7 @@ class TcpLayer {
                     break
 
                 case (State.S_SEND_FIN_ACK_ACK):
-                    Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)}", 2)
+                    Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)}", 8)
                     // FIN+ACK empfangen, ACK senden
                     sendAckFlag = true
                     sendFinFlag = false
@@ -611,7 +598,7 @@ class TcpLayer {
             // ----------------------------------------------------------
             // Passiver Verbindungsabbau
                 case (State.S_SEND_FIN_ACK):
-                    Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)}", 2)
+                    Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)}", 8)
                     // FIN empfangen und senden FIN+ACK
                     sendSynFlag = false
                     sendAckFlag = true
@@ -628,7 +615,7 @@ class TcpLayer {
                     break
 
                 case (State.S_RCVD_CLS):
-                    Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)}", 2)
+                    Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)}", 8)
                     // ACK ohne Daten empfangen
 
                     //sendTpdu()
@@ -642,7 +629,7 @@ class TcpLayer {
             // ----------------------------------------------------------
 
                 default:
-                    Utils.writeLog("TcpLayer", "handleStateChange", "case Fehler: ${State.s(currState)}", 2)
+                    Utils.writeLog("TcpLayer", "handleStateChange", "case Fehler: ${State.s(currState)}", 8)
                     // nicht zu behandelnder Zustand oder null bei Fehler
                     break
             }
@@ -678,7 +665,7 @@ class TcpLayer {
         if (sendData)
             insertWaitQ(ti_idu)
 
-        Utils.writeLog("TcpLayer", "-->", "PACKET: ${ti_idu}", 22)
+        Utils.writeLog("TcpLayer", "-->", "PACKET: ${ti_idu}", 88)
         // Daten an IP-Schicht uebergeben
         toIpQ.put(ti_idu)
     }
@@ -698,7 +685,7 @@ class TcpLayer {
                     m.timeOut = m.timeOut - deltaTimeOut
                 } else {
                     // Ja
-                    Utils.writeLog("TcpLayer", "timeOut", "Sendewiederholung: ${m.idu}", 2)
+                    Utils.writeLog("TcpLayer", "timeOut", "Sendewiederholung: ${m.idu}", 7)
 
                     m.timeOut = timeOut // Timeout neu setzen
                     toIpQ.put(m.idu) // IDU an IP uebergeben
@@ -762,7 +749,7 @@ class TcpLayer {
      */
     int open(Map idu) {
 
-        Utils.writeLog("TcpLayer", "open", "initiiere Verbindung: ${idu}", 2)
+        Utils.writeLog("TcpLayer", "open", "initiiere Verbindung: ${idu}", 7)
 
         // Auftrag zum Verbindungsaufbau
         AT_IDU at_idu = new AT_IDU()
@@ -781,10 +768,10 @@ class TcpLayer {
             // deshalb ist die Nummer beliebig
             connId = 1
 
-            Utils.writeLog("TcpLayer", "open", "Verbindung wurde geöffnet: ${connId}", 2)
+            Utils.writeLog("TcpLayer", "open", "Verbindung wurde geöffnet: ${connId}", 7)
         } else {
 
-            Utils.writeLog("TcpLayer", "open", "Verbindungsaufbau fehlgeschlagen", 2)
+            Utils.writeLog("TcpLayer", "open", "Verbindungsaufbau fehlgeschlagen", 7)
             connId = 0
         }
         return connId
@@ -799,25 +786,25 @@ class TcpLayer {
      */
     Map listen() {
 
-        Utils.writeLog("TcpLayer", "listen", "warte auf Verbindung an Port: ${ownPort}", 2)
+        Utils.writeLog("TcpLayer", "listen", "warte auf Verbindung an Port: ${ownPort}", 7)
 
         // Bei Fehler wird null geliefert
         Map conn = null
 
         // Ist eine Verbindung aktiv?
         if (fsm.currentState == State.S_IDLE) {
-            Utils.writeLog("TcpLayer", "listen", "S_IDLE", 2)
+            //Utils.writeLog("TcpLayer", "listen", "S_IDLE", 7)
             // Nein
             // Warten auf Verbindungsanforderung
             waitForOpen()
-            Utils.writeLog("TcpLayer", "listen", "NOW OPEN", 2)
+            //Utils.writeLog("TcpLayer", "listen", "NOW OPEN", 7)
             // Es kann nur eine Verbindung unterhalten werden,
             // deshalb ist die Nummer eigentlich beliebig
             connId = 1
             conn = [connId: connId, srcIpAddr: dstIpAddr, srcPort: dstPort]
-            Utils.writeLog("TcpLayer", "listen", "Verbindung wurde geöffnet: ${conn}", 2)
+            Utils.writeLog("TcpLayer", "listen", "Verbindung wurde geöffnet: ${conn}", 7)
         }
-        if (!conn) Utils.writeLog("TcpLayer", "listen", "conn NULL", 2)
+        if (!conn) Utils.writeLog("TcpLayer", "listen", "conn NULL", 7)
         return conn
     }
 
@@ -830,7 +817,7 @@ class TcpLayer {
      */
     void close(Map idu) {
 
-        Utils.writeLog("TcpLayer", "close", "schliesse Verbindung: ${idu}", 2)
+        Utils.writeLog("TcpLayer", "close", "schliesse Verbindung: ${idu}", 7)
 
         // ID der Verbindung
         if (idu.connId == connId) {
@@ -845,7 +832,7 @@ class TcpLayer {
             // Warten auf Beendigung
             waitForClose()
 
-            Utils.writeLog("TcpLayer", "close", "Verbindung wurde geschlossen: ${idu.connId}", 2)
+            Utils.writeLog("TcpLayer", "close", "Verbindung wurde geschlossen: ${idu.connId}", 7)
         }
     }
 
