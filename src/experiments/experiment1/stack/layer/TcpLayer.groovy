@@ -332,7 +332,7 @@ class TcpLayer {
         }
     }
 
-    List<String> sendSegment(){
+    void sendSegment(){
         int headerS = 20
         int nutzdatenS = MSS - headerS
         if (sendData.length() > nutzdatenS) {
@@ -458,7 +458,7 @@ class TcpLayer {
                     sendAckFlag = true
                     sendFinFlag = false
 
-                    Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)} bereite Daten zum Senden vor: $sendData", 22)
+                    Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)} bereite Daten zum Senden vor: $sendData", 2)
 
                   /*  if (sendData.length() > MSS) {
 
@@ -508,7 +508,7 @@ class TcpLayer {
 
                         // Daten uebernehmen
                         ta_idu.sdu = recvData
-                        Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)} GRO?E: ${recvData.bytes.size()} EMPFANGEN: ${recvData}  ", 22)
+                        Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)} GRO?E: ${recvData.bytes.size()} EMPFANGEN: ${recvData}  ", 2)
                         Utils.writeLog("TcpLayer", "handleStateChange", "gebe Daten an App: ${ta_idu}", 2)
                         // IDU an Anwendung übergeben
                         toAppQ.put(ta_idu)
@@ -531,11 +531,12 @@ class TcpLayer {
             // ACK empfangen
 
                 case (State.S_RCVD_ACK):
-                    Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)}  ",22)
+                    Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)}  ",2)
                     // ACK ohne Daten empfangen ???
                     //Utils.writeLog("TcpLayer", "<--", "PACKET: ${it_idu}", 22)
 
                     if(sendData){
+                        sendSeqNum = recvAckNum
                         sendSegment()
                     }
 
@@ -549,7 +550,6 @@ class TcpLayer {
                         //ACKs ohne Daten werden nicht geACKt!
                         //sendTpdu()
                         //todo:Ack bestätigen
-
                     }
 
                     fsm.fire(Event.E_READY)
