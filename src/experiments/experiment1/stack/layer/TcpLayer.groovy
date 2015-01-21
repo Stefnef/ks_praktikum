@@ -468,7 +468,7 @@ class TcpLayer {
                         // Daten senden
                         sendTpdu()
                         //sendData konsumieren
-                        sendData = tmp[MSS + 1..tmp.length() - 1]
+                        sendData = tmp[MSS + 21..tmp.length() - 1]
                     } else {
                         // Daten gleich senden
                         sendTpdu()
