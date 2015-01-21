@@ -5,6 +5,7 @@ import common.utils.Utils
 import experiments.experiment1.stack.fsm.Event
 import experiments.experiment1.stack.fsm.State
 import experiments.experiment1.stack.layer.idu.AT_IDU
+import experiments.experiment1.stack.layer.idu.IDU
 import experiments.experiment1.stack.layer.idu.IT_IDU
 import experiments.experiment1.stack.layer.idu.TA_IDU
 import experiments.experiment1.stack.layer.idu.TRI_IDU
@@ -227,8 +228,8 @@ class TcpLayer {
 
             // Entfernen von quittierten Daten aus der Warteschlange
             // fuer Sendewiederholungen
-            // if (t_pdu.ackFlag)
-            //     removeWaitQ(recvAckNum)
+             if (t_pdu.ackFlag)
+                 removeWaitQ(recvAckNum)
 
             // Analysieren einer empfangenen TCP-PDU
             // Bestimmen eines Ereignises, "feuern" der FSM und Behandlung
@@ -674,7 +675,8 @@ class TcpLayer {
         ti_idu.protocol = IpLayer.PROTO_TCP
 
         // IDU in Warteschlange fuer Sendewiederholungen eintragen
-        //insertWaitQ(ti_idu)
+        if (sendData)
+            insertWaitQ(ti_idu)
 
         Utils.writeLog("TcpLayer", "-->", "PACKET: ${ti_idu}", 22)
         // Daten an IP-Schicht uebergeben
@@ -713,7 +715,7 @@ class TcpLayer {
      * Fuegt eine mit timeout an IP zu uebergebene IDU in die Sendewarteschlange ein
      * @param idu
      */
-    void insertWaitQ(Map idu) {
+    void insertWaitQ(IDU idu) {
         synchronized (sendWaitQ) {
             sendWaitQ.add([timeOut: timeOut, idu: idu])
         }
