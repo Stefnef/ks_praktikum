@@ -332,27 +332,28 @@ class TcpLayer {
         }
     }
 
-    List<String> createSegments(String data){
-        List<String> segments = []
-        int headerSize = 20
-        int segDataSize = MSS-headerSize
-        if(data.bytes.size() < segDataSize){
-            segments.add(data)
-        } else {
-            String remainingData = data
-            String segData
-            while(remainingData.bytes.size() > segDataSize){
-                segData = ""
-                segData = remainingData[0..segDataSize-1]
-                //for(Byte b : remainingData.bytes[0..segDataSize-1])
-                  //  segData += (b as char)
+    List<String> sendSegment(){
+        int headerS = 20
+        int nutzdatenS = MSS - headerS
+        if (sendData.length() > nutzdatenS) {
 
-                remainingData = remainingData[segDataSize..remainingData.length()-1]
-                segments.add(segData)
-            }
+            String tmp = sendData
+            // Daten kürzen
+            sendData = sendData[0..(nutzdatenS-1)] //todo: richtige MSS Größe
+
+            // Daten senden
+            sendTpdu()
+            //sendData konsumieren , abschneiden
+            //Utils.writeLog("TcpLayer", "handleStateChange", "Parameter Type: ${(tmp[nutzdatenS..tmp.length() - 1]).getClass()}", 22)
+            sendData = tmp[nutzdatenS..tmp.length() - 1]
+
+
+        } else {
+            // Daten gleich senden
+            sendTpdu()
+            sendData = ""
         }
-        Utils.writeLog("TcpLayer", "send", "Segmentierung der Daten: ${segments}", 2)
-        return segments
+
     }
 
     //------------------------------------------------------------------------------
@@ -459,7 +460,7 @@ class TcpLayer {
 
                     Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)} bereite Daten zum Senden vor: $sendData", 22)
 
-                    if (sendData.length() > MSS) {
+                  /*  if (sendData.length() > MSS) {
 
                         def tmp = sendData
                         // Date kürzen
@@ -472,8 +473,8 @@ class TcpLayer {
                     } else {
                         // Daten gleich senden
                         sendTpdu()
-                    }
-
+                    }*/
+                    sendSegment()
                     // Bei UTF-8 Encoding besser: sendSeqNum += sendData.bytes.size()
                     // die erwartete seqNum berechnen
                     sendSeqNum += sendData.bytes.size()
@@ -530,9 +531,14 @@ class TcpLayer {
             // ACK empfangen
 
                 case (State.S_RCVD_ACK):
-                    Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)}  GRO?E: ${recvData.bytes.size()}", 22)
+                    Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)}  ",22)
                     // ACK ohne Daten empfangen ???
                     //Utils.writeLog("TcpLayer", "<--", "PACKET: ${it_idu}", 22)
+
+                    if(sendData){
+                        sendSegment()
+                    }
+
                     if (recvData.bytes.size()) {
 
                         sendSeqNum = recvAckNum
@@ -542,6 +548,7 @@ class TcpLayer {
                         //todo: State.S_RCVD_ACK !!!
                         //ACKs ohne Daten werden nicht geACKt!
                         //sendTpdu()
+                        //todo:Ack bestätigen
 
                     }
 
