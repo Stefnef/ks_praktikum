@@ -142,7 +142,7 @@ class IpLayer {
                         // Nein
                         il_idu.nextHopAddr = nextHopAddr
 
-                    Utils.writeLog("IpLayer", "receive", "forwarding: ${li_idu}", 6)
+                    Utils.writeLog("IpLayer", "receive", "forwarding: ${li_idu}", 666)
 
                     // Daten an Link-Schicht uebergeben
                     toLinkQ.put(il_idu)

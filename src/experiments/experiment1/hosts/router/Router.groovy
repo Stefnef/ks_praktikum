@@ -166,7 +166,7 @@ class Router {
                 tempRoutingTable.unique()
             }
 
-            Utils.writeLog("Router", routerNr, "¦###¦: $tempRoutingTable", 1)
+            Utils.writeLog("Router", routerNr, "¦###¦: $tempRoutingTable", 2)
             stack.setRoutingTable(tempRoutingTable)
             //extrahieren von Information, dann iInfo als !Zeichenkette! erzeugen ...
             //Routingtabelle an Vermittlungsschicht uebergeben:
@@ -189,7 +189,7 @@ class Router {
         // Paket mit Routinginformationen packen
         // ... z.B.
         routingTable = stack.getRoutingTable()
-        Utils.writeLog("Router", routerNr, "¦###¦: $routingTable", 2)
+        Utils.writeLog("Router", routerNr, "¦###¦: $routingTable", 1)
 
         //lösche offline Nachbarn
         // für alle Nachbarn in NT

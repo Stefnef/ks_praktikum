@@ -107,7 +107,7 @@ Das Objekt ${->name} wurde angefragt!
             Map aidu = stack.tcpListen()
 
             if (!aidu) {
-                Utils.writeLog("Server", "server", "ABBRUCH!!!: ${aidu}", 1)
+                Utils.writeLog("Server", "server", "SERVER ENDE!!!!: ${aidu}", 1)
                 return
             }
             // Verbindungskennung merken
@@ -122,7 +122,6 @@ Das Objekt ${->name} wurde angefragt!
                 // -> die TCP-Verbindung wird als geschlossen angenommen
                 if (!tidu.sdu) {
                     // Nein, innere while-Schleife abbrechen
-                    //stack.tcpClose(connId: connId)
                     break
                 }
 

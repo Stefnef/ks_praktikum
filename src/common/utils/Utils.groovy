@@ -11,7 +11,7 @@ class Utils {
 
     /* Zeitkonstanten */
     /** Zeitkonstante 0.5s usw. */
-    static final long sec05 = 500, sec1 = 1000, sec2 = 2000, sec5 = 5000, sec10 = 10000
+    static final long sec05 = 500, sec1 = 1000, sec2 = 2000, sec5 = 5000, sec10 = 10000, sec20 = 20000
 
     /** Maximale Message-Queue Länge */
     static final int MAXQUEUE = 10
