@@ -214,12 +214,13 @@ class TcpLayer {
             // blockierendes Lesen von IP-Schicht
             it_idu = fromIpQ.take()
 
+
             // TCP-PDU und Parameter entnehmen
             t_pdu = it_idu.sdu as T_PDU
             dstIpAddr = it_idu.srcIpAddr
 
             Utils.writeLog("TcpLayer", "receive", "uebernimmt  von IP: ${it_idu}", 7)
-
+            Utils.writeLog("TcpLayer", " <--", "PACKET:  ${it_idu}", 88)
             // Hier z.B. noch auf richtigen Zielport testen
             if (ownPort != t_pdu.dstPort) {
                 Utils.writeLog("TcpLayer", "receive", "Ignoring coming CTP-Data for ${t_pdu.dstPort} - my port is ${ownPort}", 3)
@@ -228,9 +229,11 @@ class TcpLayer {
 
             // Entfernen von quittierten Daten aus der Warteschlange
             // fuer Sendewiederholungen
-             if (t_pdu.ackFlag)
+             if (t_pdu.ackFlag) {
+                 Utils.writeLog("TcpLayer", " recieve", "KILL:  ${recvAckNum}", 8888)
                  removeWaitQ(recvAckNum)
 
+             }
             // Analysieren einer empfangenen TCP-PDU
             // Bestimmen eines Ereignises, "feuern" der FSM und Behandlung
             // den neuen Zustands
@@ -253,7 +256,7 @@ class TcpLayer {
             int event = 0
             // Ereignis bestimmen
             Utils.writeLog("TcpLayer", "receive", "state: ${State.s(fsm.currentState)} ist aktuell.", 7)
-            Utils.writeLog("TcpLayer", " <--", "PACKET:  ${it_idu}", 88)
+
             switch(true) {
             /* case (recvSynFlag && recvAckFlag):           event = Event.E_RCVD_SYN_ACK  ;break
              case (recvAckFlag && newState == State.S_WAIT_SYN_ACK_ACK): event = Event.E_RCVD_SYN_ACK_ACK ;break
@@ -340,6 +343,9 @@ class TcpLayer {
 
             // Daten senden
             sendTpdu()
+            // Bei UTF-8 Encoding besser: sendSeqNum += sendData.bytes.size()
+            // die erwartete seqNum berechnen
+            sendSeqNum += sendData.bytes.size()
             //sendData konsumieren , abschneiden
             //Utils.writeLog("TcpLayer", "handleStateChange", "Parameter Type: ${(tmp[nutzdatenS..tmp.length() - 1]).getClass()}", 22)
             sendData = tmp[nutzdatenS..tmp.length() - 1]
@@ -349,6 +355,9 @@ class TcpLayer {
             // Daten gleich senden
             sendTpdu()
             sendData = ""
+            // Bei UTF-8 Encoding besser: sendSeqNum += sendData.bytes.size()
+            // die erwartete seqNum berechnen
+            sendSeqNum += sendData.bytes.size()
         }
 
     }
@@ -455,6 +464,10 @@ class TcpLayer {
                     sendAckFlag = true
                     sendFinFlag = false
 
+                    //sendSeqNum = rcvdAckNum
+                    //sendAckNum = rcvdSeqNum
+                    //sendData = at_idu.sdu // Anwendungsdaten übernehmen
+
                     Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)} bereite Daten zum Senden vor: $sendData", 8)
 
                   /*  if (sendData.length() > MSS) {
@@ -472,9 +485,7 @@ class TcpLayer {
                         sendTpdu()
                     }*/
                     sendSegment()
-                    // Bei UTF-8 Encoding besser: sendSeqNum += sendData.bytes.size()
-                    // die erwartete seqNum berechnen
-                    sendSeqNum += sendData.bytes.size()
+
                     // Neuen Zustand der FSM erzeugen
                     fsm.fire(Event.E_DATA_SENT)
                     break
@@ -484,11 +495,11 @@ class TcpLayer {
 
                 case (State.S_RCVD_DATA):
                     Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)}", 8)
-                    // Daten empfangen
-                    // Wurde die Sequenznummer erwartet?
                     // ACHTUNG: hier wird momentan Auslieferungsdisziplin der IP-Schicht angenommen!
                     //Utils.writeLog("TcpLayer", "handleStateChange", "recvSeqNum: ${recvSeqNum} sendAckNum: ${sendAckNum} ", 7)
 
+                    // Daten empfangen
+                    // Wurde die Sequenznummer erwartet?
                     if ( sendAckNum == recvSeqNum ) {
                         // Ja, ACK senden
                         sendSynFlag = false
@@ -512,8 +523,8 @@ class TcpLayer {
 
                         recvData = ""
 
-                        // ACK senden
-                        sendTpdu()
+                        //if (sendAckNum != 1202 && sendAckNum != 1502 && sendAckNum != 1602 && sendAckNum != 1702)
+                            sendTpdu()
                     } else if (sendAckNum < recvSeqNum) {
                         Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)} DATEN FEHLEN", 88)
                     } else if (sendAckNum > recvSeqNum) {
@@ -705,9 +716,15 @@ class TcpLayer {
      * @param idu
      */
     void insertWaitQ(IDU idu) {
+        String str = ""
+        sendWaitQ.each{x-> str += "${x.idu.sdu.seqNum} "}
+        Utils.writeLog("TcpLayer", "WQbeforeINSE", "WQ:  ${str}", 8888)
         synchronized (sendWaitQ) {
             sendWaitQ.add([timeOut: timeOut, idu: idu])
         }
+        str =""
+        sendWaitQ.each{x-> str += "${x.idu.sdu.seqNum} "}
+        Utils.writeLog("TcpLayer", "WQafterINSE", "WQ:  ${str}", 8888)
     }
 
     //------------------------------------------------------------------------------
@@ -719,11 +736,17 @@ class TcpLayer {
      * @param seqNumber
      */
     void removeWaitQ(int seqNumber) {
+        String str = ""
+        sendWaitQ.each{x-> str += "${x.idu.sdu.seqNum} "}
+        Utils.writeLog("TcpLayer", "WQbeforeREMOVE", "WQ:  ${str}", 8888)
         synchronized (sendWaitQ) {
             sendWaitQ.removeAll { m ->
-                m.idu.sdu.seqNum < seqNumber
+                m.idu.sdu.seqNum <= seqNumber
             }
         }
+        str = ""
+        sendWaitQ.each{x-> str += "${x.idu.sdu.seqNum} "}
+        Utils.writeLog("TcpLayer", "WQafterREMOVE", "WQ:  ${str}", 8888)
     }
 
     //------------------------------------------------------------------------------

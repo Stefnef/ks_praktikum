@@ -9,6 +9,7 @@ environment = "LOCAL"
 // 7: TCP,
 // 88 Pakete laut Folien
 // 8: fm,
+// 8888 waitQ
 ///////////////////
 // 6: IP,
 // 666 Forwarding in IP
@@ -130,7 +131,7 @@ environments {
             defaultRouter = "192.168.1.1"
             nameServer = "0.0.0.0"
 
-            dataSize = 1000
+            dataSize = 200
 
             networkConnectors = [
                 [virtual: true,
