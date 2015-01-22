@@ -1,7 +1,7 @@
 Version = "2.3.2"
 
 // Hier die Umgebung auswählen
-environment = "LOCAL2"
+environment = "LOCAL"
 
 // Anzeige der Meldungen von "Utils.writeLog"
 // Meldungen mit den eingetragenen Debug-Leveln werden angezeigt
