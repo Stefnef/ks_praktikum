@@ -90,7 +90,6 @@ Host: www.domain.com
      * Start der Anwendung
      */
     static void main(String[] args) {
-        System.out.println(System.getProperty("java.library.path"));
         // Client-Klasse instanziieren
         Client application = new Client()
         // und starten
