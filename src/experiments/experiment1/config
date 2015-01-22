@@ -7,23 +7,28 @@ environment = "LOCAL"
 // Meldungen mit den eingetragenen Debug-Leveln werden angezeigt
 // Normale Ausgaben:
 // 7: TCP,
+// 88 Pakete laut Folien
 // 8: fm,
 ///////////////////
 // 6: IP,
+// 666 Forwarding in IP
 ///////////////////
 // 5: Link,
+// 55 ARP in Linklayer
+// 555 ARP Debug
 ////////////////////
 // 4: UDP,
 ////////////////////////
 // 1: !!!!!!!!!!!! STANDARD GERAETE AUSGABE
 ///////////////////////////////////
-// 2: Routing Shit
+// 2: Routing
+// 222 Routing Debug
 ////////////////////////////////////////
-// 666 Forwarding in IP
 
-//debugLevel = [22]
 
-debugLevel = [7,1,88,666]
+debugLevel = [88,666]
+
+//debugLevel = [1,2,4,5,6,7,88,666]
 
 // Verzögerung in Millisekunden bei der Ausgabe von Utils.writelog (zum Mitlesen auf dem Terminal)
 debugDelay = 100
@@ -38,8 +43,8 @@ timeOut = deltaTimeOut * 10 // Timeout fuer Sendewiederholung
 globalNetMask = "255.255.255.0"
 
 // Zeitabstand in Sekunden, in dem von Routern periodisch Routinginformationen verschickt werden
-periodRInfo = 2500
-lifeTime = 1 // lifeTime = x * periodRInfo
+periodRInfo = 1000
+lifeTime = 4 // lifeTime = x * periodRInfo
 
 // Auswahl einer Ablaufumgebung durch Setzen der Konstanten "environment"
 environments {

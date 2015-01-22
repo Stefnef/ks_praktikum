@@ -323,11 +323,7 @@ class TcpLayer {
                 case DATA:
                     // Daten senden
                     sendData = at_idu.sdu // Anwendungsdaten übernehmen
-                    //List<String> segements = createSegments(sendData)
-                    //for(String segment : segements) {
-                        //sendData = segment
-                        handleStateChange(Event.E_SEND_DATA)
-                    //}
+                    handleStateChange(Event.E_SEND_DATA)
                     break
             }
         }
@@ -520,8 +516,14 @@ class TcpLayer {
                         sendTpdu()
                     } else if (sendAckNum < recvSeqNum) {
                         Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)} DATEN FEHLEN", 88)
-                    } else {
+                    } else if (sendAckNum > recvSeqNum) {
                         Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)} DATEN DOPPEL", 88)
+                        // ACK nochmal Senden
+                        sendAckFlag = true
+                        sendSynFlag = false
+                        sendFinFlag = false
+                        sendData = ""
+                        sendTpdu()
                     }
 
                     // Neuen Zustand der FSM erzeugen
@@ -685,8 +687,8 @@ class TcpLayer {
                     m.timeOut = m.timeOut - deltaTimeOut
                 } else {
                     // Ja
-                    Utils.writeLog("TcpLayer", "timeOut", "Sendewiederholung: ${m.idu}", 7)
-
+                    //Utils.writeLog("TcpLayer", "timeOut", "Sendewiederholung: ${m.idu}", 7)
+                    Utils.writeLog("TcpLayer", "timeOut", "|@@@@|: ${m.idu}", 88)
                     m.timeOut = timeOut // Timeout neu setzen
                     toIpQ.put(m.idu) // IDU an IP uebergeben
                 }
@@ -786,7 +788,7 @@ class TcpLayer {
      */
     Map listen() {
 
-        Utils.writeLog("TcpLayer", "listen", "warte auf Verbindung an Port: ${ownPort}", 7)
+        Utils.writeLog("TcpLayer", "listen", "warte auf Verbindung an TCP-Port: ${ownPort}", 7)
 
         // Bei Fehler wird null geliefert
         Map conn = null

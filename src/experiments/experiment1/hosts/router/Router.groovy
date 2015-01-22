@@ -104,7 +104,7 @@ class Router {
             // Auf UDP-Empfang warten
             (iPAddr, port, rInfo) = stack.udpReceive()
 
-            Utils.writeLog("Router", routerNr, "empfängt von $iPAddr:$port: $rInfo ", 2)
+            Utils.writeLog("Router", routerNr, "    |<<<|$iPAddr:$port| Info: $rInfo ", 2)
 
             // Nachbar Counter zurücksetzen
             for ( List nt in neighborTable){
@@ -112,7 +112,7 @@ class Router {
                     nt[3] = lifeTime
                 }
             }
-            Utils.writeLog("Router", routerNr, "|+++|: $neighborTable ", 2)
+            Utils.writeLog("Router", routerNr, "    |***| $neighborTable ", 2)
 
 
             //Jetzt aktuelle Routingtablle holen:
@@ -154,19 +154,19 @@ class Router {
                                     //sind Metriken identisch und ist es nicht der gleiche Eintrag?
                                     //-> ja => Eintrag zur Routingtabelle hinzufügen
                                     tempRoutingTable.add(newRoutingRow)
-                                    Utils.writeLog("Router", routerNr, "hinzugefügen von $newRoutingRow (gleiche Metrik)", 2)
+                                    Utils.writeLog("Router", routerNr, "|+++| $newRoutingRow (gleiche Metrik)", 2)
                                 }
                             }
                         } else {
                             tempRoutingTable.add(newRoutingRow)
-                            Utils.writeLog("Router", routerNr, "hinzugefügen von $newRoutingRow ", 2)
+                            Utils.writeLog("Router", routerNr, "    |+++| $newRoutingRow ", 2)
                         }
                     }
                 }
                 tempRoutingTable.unique()
             }
 
-            Utils.writeLog("Router", routerNr, "¦###¦: $tempRoutingTable", 2)
+            Utils.writeLog("Router", routerNr, "    |###| $tempRoutingTable", 2)
             stack.setRoutingTable(tempRoutingTable)
             //extrahieren von Information, dann iInfo als !Zeichenkette! erzeugen ...
             //Routingtabelle an Vermittlungsschicht uebergeben:
@@ -189,12 +189,13 @@ class Router {
         // Paket mit Routinginformationen packen
         // ... z.B.
         routingTable = stack.getRoutingTable()
-        Utils.writeLog("Router", routerNr, "¦###¦: $routingTable", 1)
-
+        Utils.writeLog("Router", routerNr+"sP", "|###| $routingTable", 1)
+        Utils.writeLog("Router", routerNr+"sP", "|***| $neighborTable", 1)
         //lösche offline Nachbarn
         // für alle Nachbarn in NT
         for (List neighbour in neighborTable) {
             // ist Nachbar tot?
+            //Utils.writeLog("Router", routerNr, "neighbour[3]: ${neighbour[3]}", 2)
             if (!neighbour[3]){
                 //ja, Routen löschen
                 foundRoutingRows = routingTable.findAll({
@@ -203,7 +204,7 @@ class Router {
                     // die nicht Backbone sind
                     Utils.getNetworkId(neighbour[0], rrow[1] as String) != rrow[0]
                 })
-                Utils.writeLog("Router", routerNr, "lösche aus RT: $foundRoutingRows", 2)
+                Utils.writeLog("Router", routerNr+"sP", "    |---| $foundRoutingRows", 2)
                 routingTable.removeAll(foundRoutingRows)
                 stack.setRoutingTable(routingTable)
 
@@ -223,7 +224,7 @@ class Router {
             //ja ist Backbone, nicht propagieren
             //nein, kein Backbone - Route senden (und damit nur Netz1 und Netz2 propagieren aber kein Backbone)
             if (!neigbr) {
-                Utils.writeLog("Router", routerNr, "Propagiere Route: ${route}", 2)
+                Utils.writeLog("Router", routerNr+"sP", "    |ooo| ${route}", 2)
                 //senden, Router ist nextHop für dieses jeweilige Netz
                 //192.168.1.0/24 10.10.1.1 lp2
                 //192.168.1.0/24 10.10.4.2 lp5
@@ -255,6 +256,8 @@ class Router {
         // Zum Senden uebergeben
         if (rInfo)
             sendToNeigbors(rInfo)
+        else
+            Utils.writeLog("Router", routerNr+"sP", "    |ooo| ...", 2)
     }
 
     // ------------------------------------------------------------
@@ -267,7 +270,7 @@ class Router {
     void sendToNeigbors(String rInfo) {
         // rInfo an alle Nachbarrouter versenden
         for (List neigbor in neighborTable) {
-            Utils.writeLog("Router", routerNr, "sende an Nachbar: ${neigbor[0]} Info: $rInfo", 2)
+            Utils.writeLog("Router", routerNr, "    |>>>|${neigbor[0]}:${neigbor[1]}| Info: $rInfo", 2)
             stack.udpSend(dstIpAddr: neigbor[0], dstPort: neigbor[1], srcPort: config.ownPort, sdu: rInfo)
         }
     }

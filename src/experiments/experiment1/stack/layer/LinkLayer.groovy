@@ -146,7 +146,7 @@ class LinkLayer {
                                     // Gesuchte MAC-Adresse uebernehmen
                                     String macAddr = ar_pdu.senderHardAddr
 
-                                    Utils.writeLog("LinkLayer", "receive", "empfaengt ARP-Reply von ${ar_pdu.senderProtoAddr}: ${macAddr}", 5)
+                                    Utils.writeLog("LinkLayer", "receiveARP", "empfaengt ARP_REPLY von ${ar_pdu.senderProtoAddr}: ${macAddr}", 55)
 
                                     // MAC-Adresse an wartenden Sender-Thread uebergeben
                                     arpQ.put(macAddr)
@@ -158,8 +158,6 @@ class LinkLayer {
                                 if (ar_pdu.targetProtoAddr == ownIpAddrs[cl_idu.lpName]) {
                                     // Ja
                                     // ARP-Reply senden
-
-
 
                                     ar_pdu.operation = ARP_REPLY
                                     //Eigene IP-Adresse zwischenspeichern
@@ -180,13 +178,14 @@ class LinkLayer {
                                     if(!arpTable[ar_pdu.targetProtoAddr])
                                         arpTable[ar_pdu.targetProtoAddr] = macFrame.dstMacAddr
 
+                                    Utils.writeLog("LinkLayer", "receiveARP", "sendet ARP_REQUEST: ${lc_idu} ", 55)
                                     // MAC-Frame mit ARP-PDU an Anschluss uebergeben
                                     // IDU erzeugen
                                     lc_idu = new LC_IDU()
                                     lc_idu.sdu = macFrame
                                     connector.send(lc_idu)
 
-                                    Utils.writeLog("LinkLayer", "receive", "empfing ARP-Request und sendet Reply: ${lc_idu} ", 5)
+
                                 }
                                 break
                         }
@@ -232,6 +231,7 @@ class LinkLayer {
 
             // MAC-Frame erzeugen
             macFrame = new L_PDU()
+
             // MAC-Adresse des Anschlusses holen
             macFrame.srcMacAddr = connector.getMacAddr()
 
@@ -257,8 +257,10 @@ class LinkLayer {
             // (Address Resolution Protocol) dynamisch bestimmt wird.
             // Wird kein Eintrag gefunden -> null (siehe "?."-Operator)
             macFrame?.dstMacAddr = arpTable[il_idu.nextHopAddr]
-            //Utils.writeLog("LinkLayer", "send", "gefundene MAC: ${macFrame.dstMacAddr}", 5)
+            Utils.writeLog("LinkLayer", "sendARP", "in ARP-TABLE: ${macFrame.dstMacAddr}", 555)
             // Wurde die MAC-Adresse fuer das naechste Ziel in der ARP-Tabelle gefunden?
+
+            String nextMacAddr
             if (!macFrame.dstMacAddr) {
                 // Nein -> ARP verwenden
 
@@ -269,7 +271,7 @@ class LinkLayer {
                 // ARP_PDU erzeugen
                 AR_PDU ar_pdu = new AR_PDU()
                 ar_pdu.operation = ARP_REQUEST //fuer ARP-Anforderung
-                ar_pdu.senderProtoAddr =  ownIpAddrs[lpName] // IP-Adresse des Senders
+                ar_pdu.senderProtoAddr = ownIpAddrs[lpName] // IP-Adresse des Senders
                 ar_pdu.senderHardAddr = macFrame.srcMacAddr // MAC-Adresse des Senders
 
                 ar_pdu.targetProtoAddr = il_idu.nextHopAddr // IP-Adresse des ARP-Ziels
@@ -279,32 +281,39 @@ class LinkLayer {
                 macFrame.sdu = ar_pdu
                 macFrame.type = ETHERTYPE_ARP // Typfeld
 
-                Utils.writeLog("LinkLayer", "send", "sendet ARP-Request: ${lc_idu}", 5)
-
-                String nextMacAddr = null
-                while(nextMacAddr == null){
+                int tryCount = 10
+                while (nextMacAddr == null && tryCount) {
                     // MAC_Frame mit ARP-PDU an Anschluss uebergeben
+                    Utils.writeLog("LinkLayer", "sendARP", "sendet ARP_REQUEST: ${lc_idu}", 55)
                     connector.send(lc_idu)
-
                     // Warten auf ARP-Response, receive-Thread uebergibt die MAC-Adresse aus einem
                     // ARP-Reply ueber "arpQ"
                     // Der Sendethread blockiert hier: "quick and dirty"
                     // Besser waere es einen eigenen Thread auszufueren
                     nextMacAddr = arpQ.poll(1, TimeUnit.SECONDS)
+                    tryCount--
                 }
-                // Arp-Tabelle aktualisieren
-                arpTable[il_idu.nextHopAddr] = nextMacAddr
-                // MAC-Ziel-Adresse in MAC-Frame einsetzen
-                macFrame.dstMacAddr = "${nextMacAddr}"
+                if (nextMacAddr) {
+                    Utils.writeLog("LinkLayer", "sendARP", "nextMacAddr: ${nextMacAddr}", 555)
+                    // Arp-Tabelle aktualisieren
+                    arpTable[il_idu.nextHopAddr] = nextMacAddr
+                    // MAC-Ziel-Adresse in MAC-Frame einsetzen
+                    macFrame.dstMacAddr = "${nextMacAddr}"
+                }
             }
 
-            macFrame.sdu = il_idu.sdu // PDU entnehmen
-            macFrame.type = ETHERTYPE_IP // Typfeld
+            if (macFrame.dstMacAddr != broadcastMacAddress) {
+                Utils.writeLog("LinkLayer", "sendARP", "macFrame.dstMacAddr: ${macFrame.dstMacAddr}", 555)
+                macFrame.sdu = il_idu.sdu // PDU entnehmen
+                macFrame.type = ETHERTYPE_IP // Typfeld
 
-            Utils.writeLog("PhysLayer", "send", "uebergibt an Anschluss ${lpName}: ${lc_idu}", 5)
+                Utils.writeLog("PhysLayer", "send", "uebergibt an Anschluss ${lpName}: ${lc_idu}", 5)
+                // Daten an Anschluss uebergeben
+                connector.send(lc_idu)
 
-            // Daten an Anschluss uebergeben
-            connector.send(lc_idu)
+            } else {
+                Utils.writeLog("LinkLayer", "sendARP", "ARP-ABBRUCH", 55)
+            }
         }
     }
 
