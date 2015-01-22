@@ -1,7 +1,7 @@
 Version = "2.3.2"
 
 // Hier die Umgebung auswählen
-environment = "LOCAL"
+environment = "LOCAL2"
 
 // Anzeige der Meldungen von "Utils.writeLog"
 // Meldungen mit den eingetragenen Debug-Leveln werden angezeigt
@@ -27,7 +27,7 @@ environment = "LOCAL"
 ////////////////////////////////////////
 
 
-debugLevel = [88,666]
+debugLevel = [1,2,222,4,5,55,555,6,7,8,88,666]
 
 //debugLevel = [1,2,4,5,6,7,88,666]
 
@@ -56,20 +56,20 @@ environments {
     LOCAL2 {
         client {
             // IP-Adresse des Web-Servers
-            serverIpAddr = "192.168.1.80"
+            serverIpAddr = "192.168.43.80"
 
             // Name des Web-Servers
-            serverName = "webserver.local"
+            serverName = "google.de"
 
             // Durch HTTP-GET-Request zu ladenden Dokument
-            //document = "index.html"
-            document = "daten"
+            document = "index.html"
+            //document = "daten"
 
             // TCP- und UDP-Portnummer der Serveranwendung
             serverPort = 80
 
             // Eigene IPv4-Adresse
-            ownIPAddr = "192.168.1.100"
+            ownIPAddr = "192.168.43.100"
 
             // Eigene MAC-Adresse
             ownMacAddr = "01:01:01:01:01:01"
@@ -78,12 +78,12 @@ environments {
             ownPort = 5100
 
             // Standard-Router ???
-            routerIpAddr = "192.168.1.1"
-            defaultRouter = "192.168.1.1"
+            routerIpAddr = "192.168.43.1"
+            defaultRouter = "192.168.43.1"
 
 
             // IP-Adresse des Nameservers
-            nameServerIpAddr = "192.168.1.53"
+            nameServerIpAddr = "192.168.43.53"
             nameServerPort = 53
 
             // Festlegung der Netzwerkanschluesse
@@ -99,12 +99,14 @@ environments {
             //      macAddr: "00:00:00:00:00:00" - die MAC-Adresse des Anschlusses
             //      ipAddr: "0.0.0.0" - die diesem Link-Port bzw. Anschluss zugewiesene IP-Adresse
             networkConnectors = [
-                [virtual: true,
+                [virtual: false,
                  lpName: "lp1",
-                 link: experiments.experiment1.links.Hub1.id,
-                 connector: experiments.experiment1.links.Hub1.HUB_PORT_1,
+                 deviceName: "eth0",
+                 //link: experiments.experiment1.links.Hub1.id,
+                 //connector: experiments.experiment1.links.Hub1.HUB_PORT_1,
                  macAddr: ownMacAddr,
                  ipAddr: ownIPAddr
+                 //recvFilter: "portrange 5000-5200 or arp" // Jpcap empfängt nur Pakete, die durch diesen Ausdruck gefiltert werden
                 ]
             ]
 
@@ -113,7 +115,7 @@ environments {
             // Für Routen in das eigene IP-Subnetz ist die Router-IP-Adresse die eigene IP-Adresse:
             // z.B.: ["192.168.1.0", "255.255.255.0", "192.168.1.10", "lp1"]
             routingTable = [
-                        ["192.168.1.0", "255.255.255.0", ownIPAddr, "lp1", "0"], // Route in das eigene LAN
+                        ["192.168.43.0", "255.255.255.0", ownIPAddr, "lp1", "0"], // Route in das eigene LAN
                         ["0.0.0.0", "0.0.0.0", defaultRouter, "lp1", "0"] // Default Route
 
                            ]
@@ -156,9 +158,9 @@ environments {
         //=============================================================================================
 
         nameserver {
-            ownIPAddr = "192.168.1.53"
+            ownIPAddr = "192.168.43.53"
             ownPort = 53
-            defaultRouter = "192.168.1.1"
+            defaultRouter = "192.168.43.1"
 
             networkConnectors = [
                 [virtual: true,
@@ -176,8 +178,9 @@ environments {
                 ]
 
             nameTable = [
-                        "webserver.local": "192.168.1.80"
-                ]
+                        "webserver.local": "192.168.1.80",
+                        "google.de": "173.194.44.63"
+                        ]
 
             arpTable = [:]
         }
