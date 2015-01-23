@@ -17,8 +17,14 @@ class T_PDU extends PDU  {
     String sdu
 
     String toString() {
-        return String.format("TPDU:[seqNum:${seqNum}, ackNum:${ackNum}, ackFlag:${ackFlag}, synFlag:${synFlag}, " +
-                "finFlag:${finFlag}, rstFlag:${rstFlag}, dstPort:${dstPort}, srcPort:${srcPort}, windSize:${windSize}, sdu:${sdu}]")
+        try {
+            return String.format("TPDU:[seqNum:${seqNum}, ackNum:${ackNum}, ackFlag:${ackFlag}, synFlag:${synFlag}, " +
+                    "finFlag:${finFlag}, rstFlag:${rstFlag}, dstPort:${dstPort}, srcPort:${srcPort}, windSize:${windSize}, sdu:${sdu}]")
+        }
+        catch (Exception e){
+            return "TPDU:[seqNum:${seqNum}, ackNum:${ackNum}, ackFlag:${ackFlag}, synFlag:${synFlag}, " +
+                    "finFlag:${finFlag},...]"
+        }
     }
 }
 

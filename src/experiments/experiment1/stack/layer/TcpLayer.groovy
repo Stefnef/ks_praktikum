@@ -38,7 +38,7 @@ class TcpLayer {
     static final int DATA = 130
 
     /** Maximales TCP-Empfangsfenster */
-    static final int WINDOWSIZE = 1000
+    static final int WINDOWSIZE = 100
 
     /** Maximale TCP-Segmentgrösse */
     static final int MSS = 120
@@ -387,7 +387,7 @@ class TcpLayer {
                     Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)}", 8)
                     // Verbindungsaufbau beginnen
                     sendAckNum = 0
-                    sendSeqNum = 101//new Random().nextInt(6000) + 1
+                    sendSeqNum = new Random().nextInt(6000) + 1
 
                     sendAckFlag = false
                     sendSynFlag = true
@@ -433,7 +433,7 @@ class TcpLayer {
                     sendSynFlag = true
                     sendAckFlag = true
                     sendAckNum = recvSeqNum + 1
-                    sendSeqNum = 1001//new Random().nextInt(10) + 1
+                    sendSeqNum = new Random().nextInt(10) + 1
                     sendFinFlag = false
                     sendRstFlag = false
                     sendData = ""
@@ -516,7 +516,7 @@ class TcpLayer {
 
                         // Daten uebernehmen
                         ta_idu.sdu = recvData
-                        Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)} GRO?E: ${recvData.bytes.size()} EMPFANGEN: ${recvData}  ", 8)
+                        Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)} GROESSE: ${recvData.bytes.size()} EMPFANGEN: ${recvData}  ", 8)
                         Utils.writeLog("TcpLayer", "handleStateChange", "gebe Daten an App: ${ta_idu}", 8)
                         // IDU an Anwendung übergeben
                         toAppQ.put(ta_idu)
@@ -525,10 +525,8 @@ class TcpLayer {
 
                         //if (sendAckNum != 1202 && sendAckNum != 1502 && sendAckNum != 1602 && sendAckNum != 1702)
                             sendTpdu()
-                    } else if (sendAckNum < recvSeqNum) {
-                        Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)} DATEN FEHLEN", 88)
-                    } else if (sendAckNum > recvSeqNum) {
-                        Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)} DATEN DOPPEL", 88)
+                    } else {
+                        Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)} ACK wird wiederolt", 88)
                         // ACK nochmal Senden
                         sendAckFlag = true
                         sendSynFlag = false
@@ -573,13 +571,14 @@ class TcpLayer {
                 case (State.S_SEND_FIN):
                     Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)}", 8)
                     // Verbindungsabbau beginnen
-
-                    sendSynFlag = false
-                    sendAckFlag = true
+                    //sendSeqNum += 1
                     sendAckNum = recvSeqNum + 1
-                    sendSeqNum += 1
+
+                    sendAckFlag = true
+                    sendSynFlag = false
                     sendFinFlag = true
                     sendRstFlag = false
+
                     sendData = ""
 
                     // T-PDU erzeugen und senden

@@ -1,7 +1,7 @@
 Version = "2.3.2"
 
 // Hier die Umgebung auswählen
-environment = "LOCAL"
+environment = "EDUROAM"
 
 // Anzeige der Meldungen von "Utils.writeLog"
 // Meldungen mit den eingetragenen Debug-Leveln werden angezeigt
@@ -27,7 +27,7 @@ environment = "LOCAL"
 ////////////////////////////////////////
 
 
-debugLevel = [1,2,222,4,5,55,555,6,7,8,88,666]
+debugLevel = [88,666]
 
 //debugLevel = [1,2,4,5,6,7,88,666]
 
@@ -49,6 +49,54 @@ lifeTime = 4 // lifeTime = x * periodRInfo
 
 // Auswahl einer Ablaufumgebung durch Setzen der Konstanten "environment"
 environments {
+
+    // ********* EDUROAM ********** //
+    // client2 selbsständig an externen Web-Server
+
+    EDUROAM {
+        client {
+
+          // serverIpAddr = "80.246.60.223" //kristians web server
+           serverIpAddr = "91.198.174.192" //wikipedia org
+           //serverIpAddr = "82.165.96.2" //olle hauke
+           //serverIpAddr = "173.194.113.191" // www.google.de
+         // serverIpAddr = "141.20.5.188" // IP-Adresse des Web-Servers des Instituts
+          serverPort = 80     // Portnummer des HTTP-Dienstes
+          document = "index.html"   // Durch HTTP-GET-Request zu ladenden Dokument
+          //hostName = "web02.w3root.de"
+          hostName = "www.cedrina.de"
+
+          routerIpAddr = "192.168.43.1" // Adresse des Default Router
+
+          ownPort = 5101
+
+          // Festlegung der Netzwerkanschluesse
+          networkConnectors = [
+              [
+              virtual: false,
+              lpName: "lp1",
+              // deviceName: Gerätename des Betriebssystems, hier: Mac OS X, WLAN-Adapter
+              deviceName: "wlan0",
+              macAddr: "b8:f6:b1:18:0d:9b",
+              macAddr: "00:24:d6:74:16:aa",
+              ipAddr: "192.168.43.172",
+              // Dieser Filter fuer Jpcap ist so zu setzen, das nur die erwarteten Frames empfangen werden
+              // Die Filtersyntax entspricht der des Kommandos "tcpdump"
+              recvFilter: "portrange 5000-5200 or arp" // Jpcap empfängt nur Pakete, die durch diesen Ausdruck gefiltert werden
+              ]
+          ]
+
+          // Initiale Routing-Tabelle
+          // [["Ziel-IP-Adresse", "Prefix", "Router-IP-Adresse", "Anschluss"], ...]
+          routingTable = [
+                  ["0.0.0.0", "0.0.0.0", routerIpAddr, "lp1"]
+              ]
+
+          // Map<IP-Adresse, MAC-Adresse>
+          arpTable = [:]
+        }
+    }
+
     // ********* LOCAL ********** //
     // Erste Teile der Versuche: schrittweiser Aufbau eines kompletten Netzwerks
     // Lokale Arbeit, Verwendung von client1/server1 oder client2/server2
@@ -63,6 +111,7 @@ environments {
 
             // Durch HTTP-GET-Request zu ladenden Dokument
             document = "index.html"
+            hostName = "web02.w3root.de"
             //document = "daten"
 
             // TCP- und UDP-Portnummer der Serveranwendung
@@ -812,45 +861,5 @@ environments {
             // Map<IP-Adresse, MAC-Adresse>
             arpTable = [:]
        }
-    }
-
-    // ********* EDUROAM ********** //
-    // client2 selbsständig an externen Web-Server
-
-    EDUROAM {
-        client {
-          // serverIpAddr = "173.194.113.191" // www.google.de
-          serverIpAddr = "141.20.5.188" // IP-Adresse des Web-Servers des Instituts
-          serverPort = 80     // Portnummer des HTTP-Dienstes
-          document = "index.html"   // Durch HTTP-GET-Request zu ladenden Dokument
-
-          routerIpAddr = "141.20.191.1" // Adresse des Default Router
-
-          ownPort = 5101
-
-          // Festlegung der Netzwerkanschluesse
-          networkConnectors = [
-              [
-              virtual: false,
-              lpName: "lp1",
-              // deviceName: Gerätename des Betriebssystems, hier: Mac OS X, WLAN-Adapter
-              deviceName: "en0",
-              macAddr: "b8:f6:b1:18:0d:9b",
-              ipAddr: "141.20.191.150",
-              // Dieser Filter fuer Jpcap ist so zu setzen, das nur die erwarteten Frames empfangen werden
-              // Die Filtersyntax entspricht der des Kommandos "tcpdump"
-              recvFilter: "portrange 5000-5200 or arp" // Jpcap empfängt nur Pakete, die durch diesen Ausdruck gefiltert werden
-              ]
-          ]
-
-          // Initiale Routing-Tabelle
-          // [["Ziel-IP-Adresse", "Prefix", "Router-IP-Adresse", "Anschluss"], ...]
-          routingTable = [
-                  ["0.0.0.0", "0.0.0.0", routerIpAddr, "lp1"]
-              ]
-
-          // Map<IP-Adresse, MAC-Adresse>
-          arpTable = [:]
-        }
     }
 }

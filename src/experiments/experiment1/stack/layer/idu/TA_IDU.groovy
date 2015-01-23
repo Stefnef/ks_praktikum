@@ -19,6 +19,10 @@ class TA_IDU extends IDU {
 
     /** Konvertieren in Text */
     String toString() {
-        return String.format("TU_IDU: [srcIpAddr: ${srcIpAddr}, srcPort: ${srcPort}, sdu: ${sdu}]")
+        try {
+            return String.format("TU_IDU: [srcIpAddr: ${srcIpAddr}, srcPort: ${srcPort}, sdu: ${sdu}]")
+        } catch (Exception e) {
+            return String.format("TU_IDU: [srcIpAddr: ${srcIpAddr}, srcPort: ${srcPort}, sdu:...]")
+        }
     }
 }
