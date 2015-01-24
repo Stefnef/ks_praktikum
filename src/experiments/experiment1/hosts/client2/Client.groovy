@@ -41,7 +41,7 @@ class Client {
     String request =
             """\
 GET /${config.document} HTTP/1.1
-Host: www.domain.com
+Host: ${config.hostName}
 
 """
 /** DNS-Request **/
@@ -116,8 +116,8 @@ Host: www.domain.com
         serverPort = config.serverPort
 
         // IPv4-Adresse und Portnummer des DNS
-        nameServerIpAddr = config.nameServerIpAddr
-        nameServerPort = config.nameServerPort
+//        nameServerIpAddr = config.nameServerIpAddr
+//        nameServerPort = config.nameServerPort
 
         // Netzwerkstack initialisieren
         stack = new Stack()
@@ -132,7 +132,7 @@ Host: www.domain.com
         def rdata
         // dummies
 
-        if (nameServerIpAddr) {
+/*        if (nameServerIpAddr) {
             //sende DNS-Anfrage an Nameserver
             stack.udpSend(dstIpAddr: nameServerIpAddr, dstPort: nameServerPort, srcPort: ownPort, sdu: dns_request)
 
@@ -144,7 +144,7 @@ Host: www.domain.com
 
             //ersetze serverIpAdress mit IP-Adresse vom Nameserver
             if (rdata) serverIpAddr = rdata
-        }
+        }*/
 
         // Eine TCP-Verbindung öffnen
         connId = stack.tcpOpen(dstIpAddr: serverIpAddr, dstPort: serverPort)

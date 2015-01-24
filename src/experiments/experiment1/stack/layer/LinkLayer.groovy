@@ -99,7 +99,7 @@ class LinkLayer {
             // Mac-Frame (L-PDU) entnehmen
             L_PDU macFrame = cl_idu.sdu as L_PDU
 
-            Utils.writeLog("PhysLayer", "receive", "uebernimmt von Anschluss ${cl_idu.lpName}: ${cl_idu}", 5)
+            Utils.writeLog("LinkLayer", "receive", "uebernimmt von Anschluss ${cl_idu.lpName}: ${cl_idu}", 5)
 
             // IP-PDU behandeln:
 
@@ -178,13 +178,13 @@ class LinkLayer {
                                     if(!arpTable[ar_pdu.targetProtoAddr])
                                         arpTable[ar_pdu.targetProtoAddr] = macFrame.dstMacAddr
 
-                                    Utils.writeLog("LinkLayer", "receiveARP", "sendet ARP_REQUEST: ${lc_idu} ", 55)
+
                                     // MAC-Frame mit ARP-PDU an Anschluss uebergeben
                                     // IDU erzeugen
                                     lc_idu = new LC_IDU()
                                     lc_idu.sdu = macFrame
                                     connector.send(lc_idu)
-
+                                    Utils.writeLog("LinkLayer", "receiveARP", "sendet ARP_REQUEST: ${lc_idu} ", 55)
 
                                 }
                                 break
@@ -231,7 +231,7 @@ class LinkLayer {
 
             // MAC-Frame erzeugen
             macFrame = new L_PDU()
-
+            Utils.writeLog("LinkLayer", "send", "MACFRAME: ${macFrame}", 5)
             // MAC-Adresse des Anschlusses holen
             macFrame.srcMacAddr = connector.getMacAddr()
 
@@ -303,11 +303,11 @@ class LinkLayer {
             }
 
             if (macFrame.dstMacAddr != broadcastMacAddress) {
-                Utils.writeLog("LinkLayer", "sendARP", "macFrame.dstMacAddr: ${macFrame.dstMacAddr}", 555)
+                //Utils.writeLog("LinkLayer", "sendARP", "macFrame.dstMacAddr: ${macFrame.dstMacAddr}", 555)
                 macFrame.sdu = il_idu.sdu // PDU entnehmen
                 macFrame.type = ETHERTYPE_IP // Typfeld
 
-                Utils.writeLog("PhysLayer", "send", "uebergibt an Anschluss ${lpName}: ${lc_idu}", 5)
+                Utils.writeLog("LinkLayer", "send", "uebergibt an Anschluss ${lpName}: ${lc_idu}", 5)
                 // Daten an Anschluss uebergeben
                 connector.send(lc_idu)
 

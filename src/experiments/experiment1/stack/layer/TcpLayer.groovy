@@ -38,7 +38,7 @@ class TcpLayer {
     static final int DATA = 130
 
     /** Maximales TCP-Empfangsfenster */
-    static final int WINDOWSIZE = 1000
+    static final int WINDOWSIZE = 100
 
     /** Maximale TCP-Segmentgrösse */
     static final int MSS = 120
@@ -571,7 +571,7 @@ class TcpLayer {
                 case (State.S_SEND_FIN):
                     Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)}", 8)
                     // Verbindungsabbau beginnen
-                    sendSeqNum += 1
+                    //sendSeqNum += 1
                     sendAckNum = recvSeqNum + 1
 
                     sendAckFlag = true
@@ -857,6 +857,7 @@ class TcpLayer {
             waitForClose()
 
             Utils.writeLog("TcpLayer", "close", "Verbindung wurde geschlossen: ${idu.connId}", 7)
+
         }
     }
 
