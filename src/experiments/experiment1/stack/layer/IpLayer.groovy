@@ -218,12 +218,15 @@ class IpLayer {
 
                 // An Link-Schicht uebergeben
                 il_idu.lpName = linkPortName
-
+                Utils.writeLog("IpLayer", "nextHopAddr", " ${nextHopAddr}", 6)
+                Utils.writeLog("IpLayer", "ownIPAddrs", " ${ownIpAddrs}", 6)
                 // Ist es eine direkte Route?
-                if (nextHopAddr == ownIpAddrs[linkPortName])
-                    // Ja
-                    il_idu.nextHopAddr = i_pdu.dstIpAddr
-                else
+                if (nextHopAddr == ownIpAddrs[linkPortName]) {
+
+
+                // Ja
+                il_idu.nextHopAddr = i_pdu.dstIpAddr
+                }else
                     // Nein
                     il_idu.nextHopAddr = nextHopAddr
 

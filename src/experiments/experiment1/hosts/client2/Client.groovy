@@ -115,10 +115,6 @@ Host: ${config.hostName}
         serverIpAddr = config.serverIpAddr
         serverPort = config.serverPort
 
-        // IPv4-Adresse und Portnummer des DNS
-//        nameServerIpAddr = config.nameServerIpAddr
-//        nameServerPort = config.nameServerPort
-
         // Netzwerkstack initialisieren
         stack = new Stack()
         stack.start(config)
@@ -130,22 +126,27 @@ Host: ${config.hostName}
         // ------------------------------------------------------------
         String d1, d2
         def rdata
-        // dummies
 
-/*        if (nameServerIpAddr) {
-            //sende DNS-Anfrage an Nameserver
-            stack.udpSend(dstIpAddr: nameServerIpAddr, dstPort: nameServerPort, srcPort: ownPort, sdu: dns_request)
+        if (!config.global) {
+            // dummies
+            // IPv4-Adresse und Portnummer des DNS
+            nameServerIpAddr = config.nameServerIpAddr
+            nameServerPort = config.nameServerPort
 
-            //empfange IP-Adresse vom Nameserver
+            if (nameServerIpAddr) {
+                //sende DNS-Anfrage an Nameserver
+                stack.udpSend(dstIpAddr: nameServerIpAddr, dstPort: nameServerPort, srcPort: ownPort, sdu: dns_request)
 
-            (d1, d2, rdata) = stack.udpReceive()
+                //empfange IP-Adresse vom Nameserver
 
-            Utils.writeLog("Client", "client-tcp", "empfängt IP-Adresse: $rdata", 1)
+                (d1, d2, rdata) = stack.udpReceive()
 
-            //ersetze serverIpAdress mit IP-Adresse vom Nameserver
-            if (rdata) serverIpAddr = rdata
-        }*/
+                Utils.writeLog("Client", "client-tcp", "empfängt IP-Adresse: $rdata", 1)
 
+                //ersetze serverIpAdress mit IP-Adresse vom Nameserver
+                if (rdata) serverIpAddr = rdata
+            }
+        }
         // Eine TCP-Verbindung öffnen
         connId = stack.tcpOpen(dstIpAddr: serverIpAddr, dstPort: serverPort)
 

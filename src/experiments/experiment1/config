@@ -3,6 +3,12 @@ Version = "2.3.2"
 // Hier die Umgebung auswählen
 environment = "MOBILEAQUA"
 //environment = "LOCALOHNEROUTER"
+//environment = "LOCAL"
+//environment = "EDUROAM"
+//environment = "LAB"
+//environment = "HOME"
+
+
 
 // Anzeige der Meldungen von "Utils.writeLog"
 // Meldungen mit den eingetragenen Debug-Leveln werden angezeigt
@@ -27,7 +33,7 @@ environment = "MOBILEAQUA"
 // 222 Routing Debug
 ////////////////////////////////////////
 
-debugLevel = [1,5,55,555,6,7,88,666]
+debugLevel = [1,7,88,666]
 //debugLevel = [1,2,222,4,5,55,555,6,7,8,88,666]
 
 //debugLevel = [1,2,4,5,6,7,88,666]
@@ -56,6 +62,8 @@ environments {
 
     EDUROAM {
         client {
+          global = true
+
           serverIpAddr = "173.194.113.191" // www.google.de
           serverIpAddr = "141.20.5.188" // IP-Adresse des Web-Servers des Instituts
           serverPort = 80     // Portnummer des HTTP-Dienstes
@@ -90,10 +98,13 @@ environments {
           // Map<IP-Adresse, MAC-Adresse>
           arpTable = [:]
         }
+
     }
 
     MOBILEAQUA {
         client {
+            global = true
+
           //serverIpAddr = "173.194.113.191" // www.google.de
           //serverIpAddr = "80.246.60.223" // kristian
           serverIpAddr = "141.20.5.188" // IP-Adresse des Web-Servers des Instituts
@@ -108,7 +119,7 @@ environments {
 
           routerIpAddr = "192.168.43.1" // Adresse des Default Router
 
-          ownIPAddr = "192.168.43.64"
+          ownIPAddr = "192.168.43.65" // die von WINDOWS !!!
           ownPort = 5101
 
           // Festlegung der Netzwerkanschluesse
@@ -118,7 +129,7 @@ environments {
               lpName: "lp1",
               // deviceName: Gerätename des Betriebssystems, hier: Mac OS X, WLAN-Adapter
               deviceName: "eth0",
-              macAddr: "08:00:27:eb:69:4d",
+              macAddr: "08:00:27:86:29:8f",
               ipAddr: ownIPAddr,
               // Dieser Filter fuer Jpcap ist so zu setzen, das nur die erwarteten Frames empfangen werden
               // Die Filtersyntax entspricht der des Kommandos "tcpdump"
@@ -138,36 +149,6 @@ environments {
           arpTable = [:]
         }
 
-        server {
-            ownIPAddr = "192.168.43.64"
-            ownPort = 80
-            defaultRouter = "192.168.43.1"
-            nameServer = "0.0.0.0"
-
-            dataSize = 1000
-
-            networkConnectors = [
-                [virtual: false,
-                 lpName: "lp1",
-                 device: "eth0",
-                 //link: experiments.experiment1.links.Hub1.id,
-                 //connector: experiments.experiment1.links.Hub1.HUB_PORT_2,
-                 macAddr: "08:00:27:eb:69:4d",
-                 ipAddr: ownIPAddr,
-                 recvFilter: "portrange 5000-5200 or arp" // Jpcap empfängt nur Pakete, die durch diesen Ausdruck gefiltert werden
-                ]
-            ]
-
-            routingTable = [
-
-                        //["192.168.43.0", "255.255.255.0", ownIPAddr, "lp1", "0"], // Route in das eigene LAN
-                        ["0.0.0.0", "0.0.0.0", defaultRouter, "lp1", "0"] // Default Route
-
-                           ]
-
-            arpTable = [:]
-        }
-
     }
 
      // ********* LOCAL ********** //
@@ -176,6 +157,8 @@ environments {
 
     LOCALOHNEROUTER {
         client {
+            global = false
+
             // IP-Adresse des Web-Servers
             serverIpAddr = "0.0.0.0"
 
@@ -200,7 +183,7 @@ environments {
 
             // Standard-Router ???
             routerIpAddr = "192.168.1.1"
-            defaultRouter = "192.168.1.1"
+            defaultRouter = "192.168.1.1" //targetprotoadress
 
 
             // IP-Adresse des Nameservers
@@ -222,6 +205,7 @@ environments {
             // Für Routen in das eigene IP-Subnetz ist die Router-IP-Adresse die eigene IP-Adresse:
             // z.B.: ["192.168.1.0", "255.255.255.0", "192.168.1.10", "lp1"]
             routingTable = [
+
                         ["192.168.1.0", "255.255.255.0", ownIPAddr, "lp1", "0"], // Route in das eigene LAN
                         ["0.0.0.0", "0.0.0.0", defaultRouter, "lp1", "0"] // Default Route
 
@@ -295,6 +279,7 @@ environments {
 
     LOCAL {
         client {
+            global = false
             // IP-Adresse des Web-Servers
             serverIpAddr = "192.168.1.80"
 
