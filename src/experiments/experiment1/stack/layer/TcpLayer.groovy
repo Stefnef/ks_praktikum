@@ -28,6 +28,11 @@ class TcpLayer {
     //========================================================================================================
 
     // Konstanten ------------------------------------------------------------------
+    //Zusatzaufgabe: Zeit der Timeouts messen
+    static long timeStart
+    static long timeEnd
+    //true, falls die TimeOuts gemessen werden sollen
+    static boolean measureTimeOut
 
     /* Kommandos/Zustaende */
     /** Öffnen einer Verbindung */
@@ -524,7 +529,14 @@ class TcpLayer {
                         recvData = ""
 
                         //if (sendAckNum != 1202 && sendAckNum != 1502 && sendAckNum != 1602 && sendAckNum != 1702)
+                        //Zusatzaufgabe: Kein ACK senden, wenn time outs gemessen werden
+                        if(!measureTimeOut) {
                             sendTpdu()
+                        } else {
+                            //merke, wann ein hätte gesendet werden müssen
+                            timeStart = System.currentTimeMillis()
+                        }
+
                     } else if (sendAckNum != recvSeqNum) {
                         Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)} DATEN DOPPEL oder FEHLEN, senden ACK nochmal ...", 88)
                         // ACK nochmal Senden
@@ -532,7 +544,17 @@ class TcpLayer {
                         sendSynFlag = false
                         sendFinFlag = false
                         sendData = ""
-                        sendTpdu()
+
+                        //Zusatzaufgabe: Kein ACK senden, wenn time outs gemessen werden
+                        if(!measureTimeOut) {
+                            sendTpdu()
+                        } else {
+                            timeEnd = System.currentTimeMillis()
+                            double difference = (timeEnd-timeStart)/1000.00
+                            Utils.writeLog("TcpLayer", "recvd_Data", "Server verlangt erneutes ACK nach: ${difference} sec (TimeOut)", 9)
+                            timeStart = System.currentTimeMillis()
+                        }
+
                     }
 
                     // Neuen Zustand der FSM erzeugen
@@ -904,6 +926,7 @@ class TcpLayer {
         ownPort = config.ownPort
         timeOut = config.timeOut
         deltaTimeOut = config.deltaTimeOut
+        measureTimeOut = config.measureTimeOut
 
         // Initialisieren der FSM
         fsm = new FiniteStateMachine(transitions, State.S_IDLE)

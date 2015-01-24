@@ -1,13 +1,14 @@
 Version = "2.3.2"
 
 // Hier die Umgebung auswählen
-environment = "MOBILEAQUA"
+//environment = "MOBILEAQUA"
 //environment = "MOBILEALEX"
 //environment = "LOCALOHNEROUTER"
 //environment = "LOCAL"
 //environment = "EDUROAM"
 //environment = "LAB"
 //environment = "HOME"
+environment = "MOBILEKPML"
 
 
 
@@ -18,6 +19,7 @@ environment = "MOBILEAQUA"
 // 88 Pakete laut Folien
 // 8: fm,
 // 8888 waitQ
+// 9: TimeOut-Messung für Zusatzaufgabe (measureTimeOut=true setzen)
 ///////////////////
 // 6: IP,
 // 666 Forwarding in IP
@@ -34,7 +36,7 @@ environment = "MOBILEAQUA"
 // 222 Routing Debug
 ////////////////////////////////////////
 
-debugLevel = [1,7,88,666]
+debugLevel = [1,7,88,666, 9]
 //debugLevel = [1,2,222,4,5,55,555,6,7,8,88,666]
 
 //debugLevel = [1,2,4,5,6,7,88,666]
@@ -45,6 +47,7 @@ debugDelay = 50
 // TCP-Schicht
 deltaTimeOut = common.utils.Utils.sec05 // Periode fuer Sendetimeout-Countdown
 timeOut = deltaTimeOut * 10 // Timeout fuer Sendewiederholung
+measureTimeOut = true //Fuer Zusatzaufgabe: Wenn true, werden keine ACKs gesendet und Timeouts gemessen
 
 // IP-Schicht
 // eine einheitliche Subnet-Maske fuer alle
@@ -821,6 +824,56 @@ environments {
             arpTable = [:]
        }
     }
+
+    MOBILEKPML {
+            client {
+                global = true
+
+              //serverIpAddr = "173.194.44.2" // www.google.de
+              //serverIpAddr = "80.246.60.223" // kristian
+              serverIpAddr = "141.20.5.188" // IP-Adresse des Web-Servers des Instituts
+              //serverIpAddr = "81.169.145.164" //vorhundert
+              //serverIpAddr = "192.168.0.27"
+              serverPort = 80     // Portnummer des HTTP-Dienstes
+              document = "index.html"   // Durch HTTP-GET-Request zu ladenden Dokument
+              hostName = "web02.w3root.de"
+
+                nameServerIpAddr = 0
+                nameServerPort = 0
+
+              routerIpAddr = "192.168.43.1" // Adresse des Default Router
+
+              ownIPAddr = "192.168.43.172" // die von WINDOWS !!!
+              ownPort = 5101
+
+              // Festlegung der Netzwerkanschluesse
+              networkConnectors = [
+                  [
+                  virtual: false,
+                  lpName: "lp1",
+                  // deviceName: Gerätename des Betriebssystems, hier: Mac OS X, WLAN-Adapter
+                  deviceName: "wlan0",
+                  macAddr: "00:24:d6:74:16:aa",
+                  ipAddr: ownIPAddr,
+                  // Dieser Filter fuer Jpcap ist so zu setzen, das nur die erwarteten Frames empfangen werden
+                  // Die Filtersyntax entspricht der des Kommandos "tcpdump"
+                  recvFilter: "portrange 5000-5200 or arp" // Jpcap empfängt nur Pakete, die durch diesen Ausdruck gefiltert werden
+                  ]
+              ]
+
+              // Initiale Routing-Tabelle
+              // [["Ziel-IP-Adresse", "Prefix", "Router-IP-Adresse", "Anschluss"], ...]
+              routingTable = [
+
+                      ["192.168.43.0", "255.255.255.0", ownIPAddr, "lp1", "0"], // Route in das eigene LAN
+                      ["0.0.0.0", "0.0.0.0", routerIpAddr, "lp1"]
+                  ]
+
+              // Map<IP-Adresse, MAC-Adresse>
+              arpTable = [:]
+            }
+
+        }
 
 
 
