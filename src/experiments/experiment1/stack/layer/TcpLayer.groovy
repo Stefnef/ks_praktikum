@@ -28,6 +28,10 @@ class TcpLayer {
     //========================================================================================================
 
     // Konstanten ------------------------------------------------------------------
+    //Zusatzaufgabe: Timeouts zählen
+    static boolean forceTimeOut
+    static long timeStart
+    static long timeEnd
 
     /* Kommandos/Zustaende */
     /** Öffnen einer Verbindung */
@@ -524,7 +528,11 @@ class TcpLayer {
                         recvData = ""
 
                         //if (sendAckNum != 1202 && sendAckNum != 1502 && sendAckNum != 1602 && sendAckNum != 1702)
+                        if(!forceTimeOut)
                             sendTpdu()
+                        else{
+                            timeStart = System.currentTimeMillis()
+                        }
                     } else {
                         Utils.writeLog("TcpLayer", "handleStateChange", "case: ${State.s(currState)} ACK wird wiederolt", 88)
                         // ACK nochmal Senden
@@ -532,7 +540,15 @@ class TcpLayer {
                         sendSynFlag = false
                         sendFinFlag = false
                         sendData = ""
-                        sendTpdu()
+                        if(!forceTimeOut)
+                            sendTpdu()
+                        else{
+                            timeEnd = System.currentTimeMillis()
+                            double difference = (timeEnd - timeStart)
+                            difference = difference/1000
+                            Utils.writeLog("TcpLayer", "handleStateChange", "timeout vom Server nach ${difference} sec", 9)
+                            timeStart = System.currentTimeMillis()
+                        }
                     }
 
                     // Neuen Zustand der FSM erzeugen
@@ -903,6 +919,9 @@ class TcpLayer {
         ownPort = config.ownPort
         timeOut = config.timeOut
         deltaTimeOut = config.deltaTimeOut
+
+        //Zusatzaufgabe: Timeouts messen
+        forceTimeOut = config.forceTimeOut
 
         // Initialisieren der FSM
         fsm = new FiniteStateMachine(transitions, State.S_IDLE)

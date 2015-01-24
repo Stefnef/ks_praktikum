@@ -1,7 +1,7 @@
 Version = "2.3.2"
 
 // Hier die Umgebung auswählen
-environment = "EDUROAM"
+environment = "KPML"
 
 // Anzeige der Meldungen von "Utils.writeLog"
 // Meldungen mit den eingetragenen Debug-Leveln werden angezeigt
@@ -25,11 +25,12 @@ environment = "EDUROAM"
 // 2: Routing
 // 222 Routing Debug
 ////////////////////////////////////////
+// 9: TIMEOUT-Messung
 
 
-debugLevel = [88,666]
+debugLevel = [1,88,666]
 
-//debugLevel = [1,2,4,5,6,7,88,666]
+//debugLevel = [1,222, 55,555,2,4,5,6,66,7,88,666]
 
 // Verzögerung in Millisekunden bei der Ausgabe von Utils.writelog (zum Mitlesen auf dem Terminal)
 debugDelay = 100
@@ -95,6 +96,158 @@ environments {
           // Map<IP-Adresse, MAC-Adresse>
           arpTable = [:]
         }
+    }
+
+    KPML {
+            client {
+                forceTimeOut = false
+                serverIpAddr = "192.168.0.228" //VERSUCH EXTERN 2
+               //serverIpAddr = "80.246.60.223" //kristians web server
+               //serverIpAddr = "91.198.174.192" //wikipedia org
+               //serverIpAddr = "82.165.96.2" //olle hauke
+               //serverIpAddr = "173.194.113.191" // www.google.de
+               //serverIpAddr = "173.194.45.63" //www.google.de (2)
+             //serverIpAddr = "141.20.5.188" // IP-Adresse des Web-Servers des Instituts
+              serverPort = 80     // Portnummer des HTTP-Dienstes
+              //document = "index.html"   // Durch HTTP-GET-Request zu ladenden Dokument
+              document = "daten"
+              //hostName = "web02.w3root.de"
+              hostName = "www.cedrina.de"
+
+              routerIpAddr = "192.168.43.1" // Adresse des Default Router
+
+              ownPort = 5101
+              ownIpAddr = "192.168.0.27"
+
+              // Festlegung der Netzwerkanschluesse
+              networkConnectors = [
+                  [
+                  virtual: false,
+                  lpName: "lp1",
+                  // deviceName: Gerätename des Betriebssystems, hier: Mac OS X, WLAN-Adapter
+                  deviceName: "eth0",
+                  macAddr: "b8:ac:6f:62:ab:8d",
+                  ipAddr: ownIpAddr,
+                  // Dieser Filter fuer Jpcap ist so zu setzen, das nur die erwarteten Frames empfangen werden
+                  // Die Filtersyntax entspricht der des Kommandos "tcpdump"
+                  recvFilter: "portrange 5000-5200 or arp" // Jpcap empfängt nur Pakete, die durch diesen Ausdruck gefiltert werden
+                  ]
+              ]
+
+              // Initiale Routing-Tabelle
+              // [["Ziel-IP-Adresse", "Prefix", "Router-IP-Adresse", "Anschluss"], ...]
+              routingTable = [
+                      ["192.168.0.0", "255.255.255.0", ownIpAddr, "lp1", "0"],
+                      ["0.0.0.0", "0.0.0.0", routerIpAddr, "lp1", "0"]
+                  ]
+
+              // Map<IP-Adresse, MAC-Adresse>
+              arpTable = [:]
+            }
+            server {
+                        ownIPAddr = "192.168.0.27"
+                        ownPort = 80
+                        defaultRouter = "192.168.43.1"
+                        nameServer = "0.0.0.0"
+
+                        dataSize = 200
+
+                        networkConnectors = [
+                            [virtual: false,
+                             lpName: "lp1",
+                             deviceName: "eth0",
+                             macAddr: "b8:ac:6f:62:ab:8d",
+                             ipAddr: ownIPAddr,
+                             recvFilter: "portrange 5000-5200 or arp" // Jpcap empfängt nur Pakete, die durch diesen Ausdruck gefiltert werden
+                            ]
+                        ]
+
+                        routingTable = [
+
+                                    ["192.168.0.0", "255.255.255.0", ownIPAddr, "lp1", "0"] // Route in das eigene LAN
+                                  //  ["0.0.0.0", "0.0.0.0", defaultRouter, "lp1", "0"] // Default Route
+
+                                       ]
+
+                        arpTable = [:]
+                    }
+        }
+
+    // ********* ETH0 ********** //
+    // client2 selbsständig an externen Web-Server
+
+    ETH0 {
+        server {
+            ownIPAddr = "192.168.43.27"
+            routerIpAddr = "192.168.0.27" // Adresse des Default Router
+            ownPort = 80
+
+            dataSize = 200
+
+            // Festlegung der Netzwerkanschluesse
+            networkConnectors = [
+                [
+                 virtual: false,
+                 lpName: "lp1",
+                 // deviceName: Gerätename im Betriebssystem
+                 deviceName: "eth0",
+                 macAddr: "b8:ac:6f:62:ab:8d",
+                 ipAddr: "192.168.0.27",
+                 //recvFilter: "portrange 5000-5200 or arp"
+                 recvFilter: "portrange 5000-5200 or arp"
+                 ]
+            ]
+
+            // Routing-Tabelle mit eingetragener Default-Route
+            // [["Ziel-IP-Adresse", "Prefix", "Router-IP-Adresse", "Anschluss"], ...]
+               routingTable = [
+                    ["0.0.0.0", "0.0.0.0", routerIpAddr, "lp1"]
+               ]
+
+            // ARP-Tabelle
+            arpTable = [:]
+         }
+
+         client {
+
+                   // serverIpAddr = "80.246.60.223" //kristians web server
+                    serverIpAddr = "192.168.0.228" //wikipedia org
+                    //serverIpAddr = "82.165.96.2" //olle hauke
+                    //serverIpAddr = "173.194.113.191" // www.google.de
+                  // serverIpAddr = "141.20.5.188" // IP-Adresse des Web-Servers des Instituts
+                   serverPort = 80     // Portnummer des HTTP-Dienstes
+                   document = "index.html"   // Durch HTTP-GET-Request zu ladenden Dokument
+                   //hostName = "web02.w3root.de"
+                   hostName = "www.cedrina.de"
+
+                   routerIpAddr = "192.168.0.27" // Adresse des Default Router
+
+                   ownPort = 5101
+
+                   // Festlegung der Netzwerkanschluesse
+                   networkConnectors = [
+                       [
+                       virtual: false,
+                       lpName: "lp1",
+                       // deviceName: Gerätename des Betriebssystems, hier: Mac OS X, WLAN-Adapter
+                       deviceName: "eth0",
+                       macAddr: "b8:f6:b1:18:0d:9b",
+                       ipAddr: "192.168.0.27",
+                       // Dieser Filter fuer Jpcap ist so zu setzen, das nur die erwarteten Frames empfangen werden
+                       // Die Filtersyntax entspricht der des Kommandos "tcpdump"
+                       recvFilter: "portrange 5000-5200 or arp" // Jpcap empfängt nur Pakete, die durch diesen Ausdruck gefiltert werden
+                       ]
+                   ]
+
+                   // Initiale Routing-Tabelle
+                   // [["Ziel-IP-Adresse", "Prefix", "Router-IP-Adresse", "Anschluss"], ...]
+                   routingTable = [
+                           ["0.0.0.0", "0.0.0.0", routerIpAddr, "lp1"]
+                       ]
+
+                   // Map<IP-Adresse, MAC-Adresse>
+                   arpTable = [:]
+                 }
     }
 
     // ********* LOCAL ********** //
