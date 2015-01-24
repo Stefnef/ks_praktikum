@@ -1,6 +1,7 @@
 Version = "2.3.2"
 
 // Hier die Umgebung auswählen
+//environment = "QUERYLOCAL"
 environment = "MOBILEAQUA"
 //environment = "MOBILEALEX"
 //environment = "LOCALOHNEROUTER"
@@ -34,8 +35,8 @@ environment = "MOBILEAQUA"
 // 222 Routing Debug
 ////////////////////////////////////////
 
-debugLevel = [1,7,88,666]
-//debugLevel = [1,2,222,4,5,55,555,6,7,8,88,666]
+//debugLevel = [1,7,88,666]
+debugLevel = [1,2,222,4,5,55,555,6,7,8,88,666]
 
 //debugLevel = [1,2,4,5,6,7,88,666]
 
@@ -214,8 +215,8 @@ environments {
             global = true
 
           //serverIpAddr = "173.194.113.191" // www.google.de
-          //serverIpAddr = "80.246.60.223" // kristian
-          serverIpAddr = "141.20.5.188" // IP-Adresse des Web-Servers des Instituts
+         //serverIpAddr = "80.246.60.223" // kristian
+           serverIpAddr = "141.20.5.188" // IP-Adresse des Web-Servers des Instituts
 
           //serverIpAddr = "192.168.0.27"
           serverPort = 80     // Portnummer des HTTP-Dienstes
@@ -227,7 +228,7 @@ environments {
 
           routerIpAddr = "192.168.43.1" // Adresse des Default Router
 
-          ownIPAddr = "192.168.43.65" // die von WINDOWS !!!
+          ownIPAddr = "192.168.43.66" // die von WINDOWS !!!
           ownPort = 5101
 
           // Festlegung der Netzwerkanschluesse
