@@ -2,6 +2,7 @@ Version = "2.3.2"
 
 // Hier die Umgebung auswählen
 environment = "MOBILEAQUA"
+//environment = "MOBILEALEX"
 //environment = "LOCALOHNEROUTER"
 //environment = "LOCAL"
 //environment = "EDUROAM"
@@ -100,7 +101,36 @@ environments {
         }
 
     }
+    MOBILEALEX {
+        server {
+            ownIPAddr = "192.168.1.80"
+            ownPort = 80
+            defaultRouter = "192.168.1.1"
+            nameServer = "0.0.0.0"
 
+            dataSize = 1000
+
+            networkConnectors = [
+                [virtual: true,
+                 lpName: "lp1",
+                 link: experiments.experiment1.links.Hub1.id,
+                 connector: experiments.experiment1.links.Hub1.HUB_PORT_2,
+                 macAddr: "80:80:80:80:80:80",
+                 ipAddr: ownIPAddr
+                ]
+            ]
+
+            routingTable = [
+
+                        ["192.168.1.0", "255.255.255.0", ownIPAddr, "lp1", "0"], // Route in das eigene LAN
+                        ["0.0.0.0", "0.0.0.0", defaultRouter, "lp1", "0"] // Default Route
+
+                           ]
+
+            arpTable = [:]
+        }
+
+    }
     MOBILEAQUA {
         client {
             global = true
